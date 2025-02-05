@@ -29,12 +29,12 @@
     <ul class="employee_lists" *ngFor="let employee of employeeList; trackBy: trackById">
       <li class="employee_list">{{ employee.id }}</li>
       <li class="employee_list">{{ employee.name }}</li>
-      <li class="employee_list">{{ employee.gender }}</li>
+      <li class="employee_list">{{ getGenderLabel(employee.gender) }}</li>
       <li class="employee_list">{{ employee.phone }}</li>
       <li class="employee_list">{{ employee.hometown }}</li>
       <li class="employee_list">{{ employee.dob | date:'dd/MM/yyyy' }}</li>
-      <li class="employee_list">{{ employee.employeeType }}</li>
-      <li class="employee_list">{{ employee.workStatus }}</li>
+      <li class="employee_list">{{ getEmployeeTypeLabel(employee.employeeType) }}</li>
+      <li class="employee_list">{{ getWorkStatusLabel(employee.workStatus) }}</li>
       <li class="employee_list">
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -63,9 +63,9 @@
     
     <select class="employee_inp" [(ngModel)]="currentEmployee.gender" required>
       <option value="">Chọn giới tính</option>
-      <option value="Nam">Nam</option>
-      <option value="Nữ">Nữ</option>
-      <option value="Khác">Khác</option>
+      <option value="1">Nam</option>
+      <option value="2">Nữ</option>
+      <option value="3">Khác</option>
     </select>
     
     <input class="employee_inp" [(ngModel)]="currentEmployee.phone" placeholder="Số Điện Thoại" required/>
@@ -79,15 +79,15 @@
     
     <select class="employee_inp" [(ngModel)]="currentEmployee.employeeType" required>
       <option value="">Chức vụ</option>
-      <option value="Trưởng phòng">Trưởng phòng</option>
-      <option value="Kế toán">Kế toán</option>
-      <option value="Nhân viên">Nhân viên</option>
+      <option value="1">Trưởng phòng</option>
+      <option value="2">Kế toán</option>
+      <option value="3">Nhân viên</option>
     </select>
     
     <select class="employee_inp" [(ngModel)]="currentEmployee.workStatus" required>
       <option value="">Trạng thái</option>
-      <option value="Đang làm">Đang làm</option>
-      <option value="Đã nghỉ">Đã nghỉ</option>
+      <option value="1">Đang làm</option>
+      <option value="2">Đã nghỉ</option>
     </select>
     
     <button class="employee_form_btn" (click)="onAddOrUpdate()">{{ editMode ? 'Lưu' : 'Lưu' }}</button>

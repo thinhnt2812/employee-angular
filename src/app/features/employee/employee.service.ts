@@ -1,33 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { Employee } from './employee.model';
+import { EmployeeService as EmployeeDBService } from '../../service/employeeDB';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = 'http://localhost:3000/employees';
+  constructor(private employeeDBService: EmployeeDBService) {}
 
-  constructor(private http: HttpClient) {}
-
-  // Lấy danh sách nhân viên
-  getEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(this.apiUrl);
+  getEmployees(): Promise<Employee[]> {
+    return this.employeeDBService.getEmployees();
   }
 
-  // Thêm nhân viên
-  addEmployee(employee: Employee): Observable<Employee> {
-    return this.http.post<Employee>(this.apiUrl, employee);
+  addEmployee(employee: Employee): Promise<IDBValidKey> {
+    return this.employeeDBService.addEmployee(employee);
   }
 
-  // Cập nhật nhân viên
-  updateEmployee(employee: Employee): Observable<Employee> {
-    return this.http.put<Employee>(`${this.apiUrl}/${employee.id}`, employee);
+  updateEmployee(employee: Employee): Promise<IDBValidKey> {
+    return this.employeeDBService.updateEmployee(employee);
   }
 
-  // Xóa nhân viên
-  deleteEmployee(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteEmployee(id: number): Promise<void> {
+    return this.employeeDBService.deleteEmployee(id);
   }
 }
