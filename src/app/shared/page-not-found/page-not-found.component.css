@@ -1,0 +1,8 @@
+.page_not_found{
+    margin-left: 240px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;           
+}

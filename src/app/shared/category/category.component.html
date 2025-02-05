@@ -1,0 +1,13 @@
+<div class="category">
+    <ul class="list_menu">
+        <li 
+            class="menu_item" 
+            *ngFor="let item of menuItems; let i = index"
+            (click)="selectMenuItem(i)" 
+            [ngClass]="{'selected': selectedMenuItem === i}"
+            [routerLink]="item.routerLink">
+                <i [class]="item.icon"></i>
+                <p>{{ item.name }}</p>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,15 @@
+.comingsoon{
+    margin-left: 240px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;           
+}
+
+.comingsoon_title{
+    padding: 20px 0;
+    color: #C62025;
+    font-weight: 200;
+    font-style: italic;
+}
