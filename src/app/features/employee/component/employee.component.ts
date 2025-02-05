@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeService } from '../employee.service';
 import { Employee } from '../employee.model';
 
@@ -12,6 +13,10 @@ import { Employee } from '../employee.model';
   styleUrls: ['./employee.component.css'],
 })
 export class EmployeeManagementComponent implements OnInit {
+  @ViewChild('employeeModal') employeeModal!: TemplateRef<any>;
+  @ViewChild('confirmDeleteModal') confirmDeleteModal!: TemplateRef<any>;
+  @ViewChild('validationErrorModal') validationErrorModal!: TemplateRef<any>;
+
   employeeList: Employee[] = [];
   originalEmployeeList: Employee[] = [];
   currentEmployee: Employee = this.getDefaultEmployee();
@@ -20,6 +25,8 @@ export class EmployeeManagementComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   totalItems: number = 0;
+  employeeIdToDelete: number | null = null;
+  validationErrorMessage: string = '';
 
   hometowns: string[] = [
     'Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
@@ -36,7 +43,12 @@ export class EmployeeManagementComponent implements OnInit {
     'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Dương'
   ];
 
-  constructor(private employeeService: EmployeeService, private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private employeeService: EmployeeService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -50,11 +62,10 @@ export class EmployeeManagementComponent implements OnInit {
   }
 
   private fetchEmployees(): void {
-    this.employeeService.getEmployees().then((data) => {
+    this.employeeService.getEmployees().then(data => {
       this.originalEmployeeList = [...data];
       this.totalItems = data.length;
       this.updateEmployeeList();
-      this.assignNewId();
     });
   }
 
@@ -76,31 +87,27 @@ export class EmployeeManagementComponent implements OnInit {
 
   private updateUrl(): void {
     this.router.navigate([], {
-      queryParams: {
-        page: this.currentPage
-      },
+      queryParams: { page: this.currentPage },
       queryParamsHandling: 'merge'
     });
   }
 
-  private assignNewId(): void {
-    const maxId = this.originalEmployeeList.length > 0 ? Math.max(...this.originalEmployeeList.map(e => Number(e.id))) : 0;
-    this.currentEmployee.id = maxId + 1;
-  }
-
   onAddOrUpdate(): void {
-    if (!this.validatePhone(this.currentEmployee.phone)) {
-      alert('Số điện thoại phải có đúng 10 chữ số!');
+    if (Object.values(this.currentEmployee).some(value => value === '')) {
+      this.validationErrorMessage = 'Vui lòng điền đầy đủ thông tin!';
+      this.modalService.open(this.validationErrorModal);
       return;
     }
 
-    if (Object.values(this.currentEmployee).some(value => value === '')) {
-      alert('Vui lòng điền đầy đủ thông tin!');
+    if (!this.validatePhone(this.currentEmployee.phone)) {
+      this.validationErrorMessage = 'Số điện thoại phải có đúng 10 chữ số!';
+      this.modalService.open(this.validationErrorModal);
       return;
     }
 
     if (!this.validateDob(this.currentEmployee.dob)) {
-      alert('Ngày sinh không được lớn hơn ngày hiện tại!');
+      this.validationErrorMessage = 'Ngày sinh không được lớn hơn ngày hiện tại!';
+      this.modalService.open(this.validationErrorModal);
       return;
     }
 
@@ -114,7 +121,7 @@ export class EmployeeManagementComponent implements OnInit {
         this.resetForm();
       });
     } else {
-      this.employeeService.addEmployee(this.currentEmployee).then((id) => {
+      this.employeeService.addEmployee(this.currentEmployee).then(id => {
         this.currentEmployee.id = id as number;
         this.originalEmployeeList.unshift(this.currentEmployee);
         this.totalItems++;
@@ -127,12 +134,21 @@ export class EmployeeManagementComponent implements OnInit {
   onEdit(employee: Employee): void {
     this.editMode = true;
     this.currentEmployee = { ...employee };
+    this.openModal();
   }
 
   onDelete(id: number): void {
-    this.employeeService.deleteEmployee(id).then(() => {
-      this.fetchEmployees();
-    });
+    this.employeeIdToDelete = id;
+    this.modalService.open(this.confirmDeleteModal);
+  }
+
+  confirmDelete(): void {
+    if (this.employeeIdToDelete !== null) {
+      this.employeeService.deleteEmployee(this.employeeIdToDelete).then(() => {
+        this.fetchEmployees();
+        this.employeeIdToDelete = null;
+      });
+    }
   }
 
   onSearch(): void {
@@ -230,5 +246,27 @@ export class EmployeeManagementComponent implements OnInit {
       case 2: return 'Đã nghỉ';
       default: return '';
     }
+  }
+
+  openModal(employee?: Employee): void {
+    if (employee) {
+      this.currentEmployee = { ...employee };
+      this.editMode = true;
+    } else {
+      this.resetForm();
+      this.editMode = false;
+      this.assignNewId();
+    }
+    this.modalService.open(this.employeeModal);
+  }
+
+  private assignNewId(): void {
+    const maxId = this.originalEmployeeList.length > 0 ? Math.max(...this.originalEmployeeList.map(e => Number(e.id))) : 0;
+    this.currentEmployee.id = maxId + 1;
+  }
+
+  openConfirmDeleteModal(id: number): void {
+    this.employeeIdToDelete = id;
+    this.modalService.open(this.confirmDeleteModal);
   }
 }

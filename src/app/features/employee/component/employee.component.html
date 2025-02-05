@@ -13,6 +13,93 @@
     />
   </div>
 
+  <button class="employee_add_btn" (click)="openModal()">Thêm Nhân Viên</button>
+
+  <ng-template #employeeModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">{{ editMode ? 'Sửa Nhân Viên' : 'Thêm Nhân Viên' }}</h5>
+      <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body modal_body_ctm">
+      <div class="form-group">
+        <label>Mã Nhân Viên</label>
+        <input class="form-control" [(ngModel)]="currentEmployee.id" placeholder="Mã Nhân Viên" disabled />
+      </div>
+      <div class="form-group">
+        <label>Họ Và Tên</label>
+        <input class="form-control" [(ngModel)]="currentEmployee.name" required />
+      </div>
+      <div class="form-group">
+        <label>Giới Tính</label>
+        <select class="form-control" [(ngModel)]="currentEmployee.gender" required>
+          <option value="1">Nam</option>
+          <option value="2">Nữ</option>
+          <option value="3">Khác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Số Điện Thoại</label>
+        <input class="form-control" [(ngModel)]="currentEmployee.phone" required />
+      </div>
+      <div class="form-group">
+        <label>Quê Quán</label>
+        <select class="form-control" [(ngModel)]="currentEmployee.hometown" required>
+          <option *ngFor="let city of hometowns" [value]="city">{{ city }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ngày Sinh</label>
+        <input class="form-control" [(ngModel)]="currentEmployee.dob" placeholder="Ngày Sinh" type="date" required />
+      </div>
+      <div class="form-group">
+        <label>Chức Vụ</label>
+        <select class="form-control" [(ngModel)]="currentEmployee.employeeType" required>
+          <option value="1">Trưởng phòng</option>
+          <option value="2">Kế toán</option>
+          <option value="3">Nhân viên</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Trạng Thái</label>
+        <select class="form-control" [(ngModel)]="currentEmployee.workStatus" required>
+          <option value="1">Đang làm</option>
+          <option value="2">Đã nghỉ</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer modal_footer_ctm">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel click')">Hủy</button>
+      <button type="button" class="btn modal-footer-cancel" (click)="onAddOrUpdate(); modal.close('Save click')">Lưu</button>
+    </div>
+  </ng-template>
+
+  <ng-template #confirmDeleteModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Xác nhận xóa</h5>
+      <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body modal_body_lable">
+      <p>Bạn có chắc chắn muốn xóa nhân viên này không?</p>
+    </div>
+    <div class="modal-footer modal_footer_ctm">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel click')">Hủy</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete(); modal.close('Delete click')">Xóa</button>
+    </div>
+  </ng-template>
+
+  <ng-template #validationErrorModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Lỗi xác thực</h5>
+      <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body modal_body_lable">
+      <p>{{ validationErrorMessage }}</p>
+    </div>
+    <div class="modal-footer modal_footer_ctm">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close click')">Đóng</button>
+    </div>
+  </ng-template>
+
   <div class="employee_table">
     <ul class="employee_info">
       <li (click)="sortEmployeesByIdDesc()">Mã NV <i class="fa fa-sort"></i></li>
@@ -36,14 +123,18 @@
       <li class="employee_list">{{ getEmployeeTypeLabel(employee.employeeType) }}</li>
       <li class="employee_list">{{ getWorkStatusLabel(employee.workStatus) }}</li>
       <li class="employee_list">
-        <div class="dropdown">
+        <!-- <div class="dropend">
           <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-gears"></i>
           </button>
           <ul class="dropdown-menu">
-            <li><button class="dropdown-item employee_btn" (click)="onEdit(employee)">Sửa</button></li>
-            <li><button class="dropdown-item employee_btn" (click)="onDelete(employee.id)">Xóa</button></li>
+            <li><button class="dropdown-item employee_btn" (click)="openModal(employee)">Sửa</button></li>
+            <li><button class="dropdown-item employee_btn" (click)="openConfirmDeleteModal(employee.id)">Xóa</button></li>
           </ul>
+        </div> -->
+        <div class="employee_list_act">
+          <li><button class="dropdown-item employee_btn" (click)="openModal(employee)">Sửa</button></li>
+          <li><button class="dropdown-item employee_btn" (click)="openConfirmDeleteModal(employee.id)">Xóa</button></li>
         </div>
       </li>
     </ul>
@@ -55,41 +146,5 @@
     <span>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} / {{ totalItems }}</span>
     <button (click)="goToNextPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">></button>
     <button (click)="goToLastPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">>></button>
-  </div>
-
-  <div class="employee_form">
-    <input class="employee_inp" [(ngModel)]="currentEmployee.id" placeholder="Mã Nhân Viên" disabled/>
-    <input class="employee_inp" [(ngModel)]="currentEmployee.name" placeholder="Họ Và Tên" required/>
-    
-    <select class="employee_inp" [(ngModel)]="currentEmployee.gender" required>
-      <option value="">Chọn giới tính</option>
-      <option value="1">Nam</option>
-      <option value="2">Nữ</option>
-      <option value="3">Khác</option>
-    </select>
-    
-    <input class="employee_inp" [(ngModel)]="currentEmployee.phone" placeholder="Số Điện Thoại" required/>
-    
-    <select class="employee_inp" [(ngModel)]="currentEmployee.hometown" required>
-      <option value="">Chọn quê quán</option>
-      <option *ngFor="let city of hometowns" [value]="city">{{ city }}</option>
-    </select>
-    
-    <input class="employee_inp" [(ngModel)]="currentEmployee.dob" placeholder="Ngày Sinh" type="date" required/>
-    
-    <select class="employee_inp" [(ngModel)]="currentEmployee.employeeType" required>
-      <option value="">Chức vụ</option>
-      <option value="1">Trưởng phòng</option>
-      <option value="2">Kế toán</option>
-      <option value="3">Nhân viên</option>
-    </select>
-    
-    <select class="employee_inp" [(ngModel)]="currentEmployee.workStatus" required>
-      <option value="">Trạng thái</option>
-      <option value="1">Đang làm</option>
-      <option value="2">Đã nghỉ</option>
-    </select>
-    
-    <button class="employee_form_btn" (click)="onAddOrUpdate()">{{ editMode ? 'Lưu' : 'Lưu' }}</button>
   </div>
 </div>
