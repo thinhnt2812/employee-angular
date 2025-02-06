@@ -8,4 +8,5 @@ export interface Employee {
   employeeType: number;
   workStatus: number;
   createdAt?: string; 
+  department: number;
 }

@@ -10,13 +10,13 @@ import { RouterLink } from "@angular/router";
 })
 export class CategoryComponent implements OnInit {
   menuItems = [
-    { name: 'Nhiệm vụ', icon: 'fa-solid fa-bars-progress', routerLink: '/comingsoon' },
+    { name: 'Nhiệm vụ', icon: 'fa-solid fa-bars-progress', routerLink: '/task' },
     { name: 'Cài Đặt', icon: 'fa-solid fa-gears', routerLink: '/comingsoon' }
   ];
 
   subMenuItems = [
     { name: 'Nhân viên', icon: 'fa-solid fa-users', routerLink: '/employee' },
-    { name: 'Phòng ban', icon: 'fa-solid fa-house-user', routerLink: '/comingsoon' }
+    { name: 'Phòng ban', icon: 'fa-solid fa-house-user', routerLink: '/department' }
   ];
 
   selectedMenuItem: number | null = null;

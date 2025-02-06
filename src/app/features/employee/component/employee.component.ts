@@ -45,6 +45,29 @@ export class EmployeeManagementComponent implements OnInit {
     'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Dương'
   ];
 
+  gender: { id: number, name: string }[] = [
+    { id: 1, name: 'Nam' },
+    { id: 2, name: 'Nữ' },
+    { id: 3, name: 'Khác' }
+  ];
+
+  employeeType: { id: number, name: string }[] = [
+    { id: 1, name: 'Trưởng phòng' },
+    { id: 2, name: 'kế toán' },
+    { id: 3, name: 'Nhân viên' }
+  ];
+
+  workStatus: { id: number, name: string }[] = [
+    { id: 1, name: 'Đang làm' },
+    { id: 2, name: 'Đã nghỉ' }
+  ];
+
+  departments: { id: number, name: string }[] = [
+    { id: 1, name: 'Phòng Giám Đốc' },
+    { id: 2, name: 'Phòng Kỹ Thuật' },
+    { id: 3, name: 'Phòng Kế Toán' }
+  ];
+
   constructor(
     private employeeService: EmployeeService,
     private router: Router,
@@ -135,6 +158,7 @@ export class EmployeeManagementComponent implements OnInit {
     this.currentEmployee.gender = Number(this.currentEmployee.gender);
     this.currentEmployee.employeeType = Number(this.currentEmployee.employeeType);
     this.currentEmployee.workStatus = Number(this.currentEmployee.workStatus);
+    this.currentEmployee.department = Number(this.currentEmployee.department);
 
     if (this.editMode) {
       this.employeeService.updateEmployee(this.currentEmployee).then(() => {
@@ -208,7 +232,7 @@ export class EmployeeManagementComponent implements OnInit {
 
   private getDefaultEmployee(): Employee {
     // Hàm này trả về đối tượng nhân viên mặc định
-    return { id: 0, name: '', gender: 0, hometown: '', dob: '', phone: '', employeeType: 0, workStatus: 0 };
+    return { id: 0, name: '', gender: 0, hometown: '', dob: '', phone: '', employeeType: 0, workStatus: 1, department: 0 };
   }
 
   sortEmployeesBy(attribute: keyof Employee): void {
@@ -274,31 +298,26 @@ export class EmployeeManagementComponent implements OnInit {
 
   getGenderLabel(gender: number): string {
     // Hàm này trả về nhãn giới tính
-    switch (gender) {
-      case 1: return 'Nam';
-      case 2: return 'Nữ';
-      case 3: return 'Khác';
-      default: return '';
-    }
+    const gend = this.gender.find(d => d.id === gender);
+    return gend ? gend.name : '';
   }
 
   getEmployeeTypeLabel(employeeType: number): string {
     // Hàm này trả về nhãn loại nhân viên
-    switch (employeeType) {
-      case 1: return 'Trưởng phòng';
-      case 2: return 'Kế toán';
-      case 3: return 'Nhân viên';
-      default: return '';
-    }
+    const eplT = this.employeeType.find(d => d.id === employeeType);
+    return eplT ? eplT.name : '';
   }
 
   getWorkStatusLabel(workStatus: number): string {
     // Hàm này trả về nhãn trạng thái làm việc
-    switch (workStatus) {
-      case 1: return 'Đang làm';
-      case 2: return 'Đã nghỉ';
-      default: return '';
-    }
+    const work = this.workStatus.find(d => d.id === workStatus);
+    return work ? work.name : '';
+  }
+
+  getDepartmentLabel(department: number): string {
+    // Hàm này trả về nhãn phòng ban
+    const dept = this.departments.find(d => d.id === department);
+    return dept ? dept.name : '';
   }
 
   openModal(employee?: Employee): void {

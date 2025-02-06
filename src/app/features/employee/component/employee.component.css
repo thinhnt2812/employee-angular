@@ -85,7 +85,7 @@
 
 .employee_info li {
     list-style: none;
-    width: calc(100%/9);
+    width: calc(100%/10); /* Adjust width to accommodate new column */
     user-select: none;
 }
 
@@ -117,7 +117,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: calc(100%/9);
+    width: calc(100%/10); /* Adjust width to accommodate new column */
     font-size: 14px;
     color: #333;
     list-style: none;
