@@ -32,3 +32,16 @@
 .menu_item p{
     margin-bottom: 0;
 }
+
+.sub_menu {
+    padding-left: 0;
+}
+
+.sub_menu_item{
+    padding: 16px 0 16px 40px;
+}
+
+.sub_menu_item.selected {
+    background-color: #353941;
+    padding-left: 50px;
+}

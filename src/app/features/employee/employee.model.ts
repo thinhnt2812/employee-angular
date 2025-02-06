@@ -7,4 +7,5 @@ export interface Employee {
   phone: string;
   employeeType: number;
   workStatus: number;
+  createdAt?: string; 
 }

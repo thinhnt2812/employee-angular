@@ -9,5 +9,16 @@
                 <i [class]="item.icon"></i>
                 <p>{{ item.name }}</p>
         </li>
+        <ul *ngIf="showSubMenu" class="sub_menu">
+            <li 
+                class="menu_item sub_menu_item" 
+                *ngFor="let subItem of subMenuItems; let j = index"
+                (click)="selectSubMenuItem(j)"
+                [ngClass]="{'selected': selectedSubMenuItem === j}"
+                [routerLink]="subItem.routerLink">
+                    <i [class]="subItem.icon"></i>
+                    <p>{{ subItem.name }}</p>
+            </li>
+        </ul>
     </ul>
 </div>

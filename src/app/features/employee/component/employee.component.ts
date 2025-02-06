@@ -104,21 +104,33 @@ export class EmployeeManagementComponent implements OnInit {
     // Hàm này xử lý thêm mới hoặc cập nhật thông tin nhân viên
     if (Object.values(this.currentEmployee).some(value => value === '')) {
       this.validationErrorMessage = 'Vui lòng điền đầy đủ thông tin!';
-      this.modalService.open(this.validationErrorModal);
+      this.modalService.open(this.validationErrorModal).result.then(
+        () => this.openModal(),
+        () => this.openModal()
+      );
       return;
     }
 
     if (!this.validatePhone(this.currentEmployee.phone)) {
       this.validationErrorMessage = 'Số điện thoại phải có đúng 10 chữ số!';
-      this.modalService.open(this.validationErrorModal);
+      this.modalService.open(this.validationErrorModal).result.then(
+        () => this.openModal(),
+        () => this.openModal()
+      );
       return;
     }
 
     if (!this.validateDob(this.currentEmployee.dob)) {
       this.validationErrorMessage = 'Ngày sinh không được lớn hơn ngày hiện tại!';
-      this.modalService.open(this.validationErrorModal);
+      this.modalService.open(this.validationErrorModal).result.then(
+        () => this.openModal(),
+        () => this.openModal()
+      );
       return;
     }
+
+    // Thêm ngày giờ hiện tại ở Việt Nam vào đối tượng nhân viên
+    this.currentEmployee.createdAt = this.getVietnamTime();
 
     this.currentEmployee.gender = Number(this.currentEmployee.gender);
     this.currentEmployee.employeeType = Number(this.currentEmployee.employeeType);
@@ -138,6 +150,12 @@ export class EmployeeManagementComponent implements OnInit {
         this.resetForm();
       });
     }
+  }
+
+  private getVietnamTime(): string {
+    const now = new Date();
+    now.setHours(now.getHours() + 7); // Điều chỉnh múi giờ UTC+7
+    return now.toISOString().replace('T', ' ').substring(0, 19);
   }
 
   onEdit(employee: Employee): void {
