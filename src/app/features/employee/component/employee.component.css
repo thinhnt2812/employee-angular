@@ -7,11 +7,11 @@
 }
 
 .employee_title{
-    padding: 20px 0;
+    padding: 16px 0;
 }
 
 .employee_search{
-    margin-bottom: 70px;
+    margin-bottom: 50px;
 }
 
 .search_inp{
@@ -39,13 +39,12 @@
     background-color: #8b0000;
     color: #fff;
     opacity: 0.8;
-    /* margin-bottom: 20px; */
     padding: 10px;
     border: none;
     border-radius: 5px;
     position: absolute;
     right: 10%;
-    top: 200px;
+    top: 176px;
 }
 
 .employee_add_btn:hover {
@@ -87,6 +86,7 @@
 .employee_info li {
     list-style: none;
     width: calc(100%/9);
+    user-select: none;
 }
 
 .employee_info li:hover{
@@ -139,6 +139,7 @@
     min-width: 50px;
     text-align: center;
     background-color: transparent;
+    inset: -13px auto auto 4px !important;
 }
 
 .employee_btn {
@@ -234,15 +235,14 @@
     box-shadow: none;
 }
 
-.employee_list_act{
-    display: flex;
-    gap: 10px;
+.status-working {
+    background-color: green;
+    border-radius: 16px;
+    color: white;
 }
 
-.employee_btn{
-    padding: 6px 10px;
-}
-
-.employee_btn:first-child{
-    margin-bottom: 0;
+.status-left {
+    background-color: red;
+    border-radius: 16px;
+    color: white;
 }

@@ -1,26 +1,41 @@
 import { Injectable } from '@angular/core';
+import { IndexedDBService } from '../../service/employee-indexedDB';
 import { Employee } from './employee.model';
-import { EmployeeService as EmployeeDBService } from '../../service/employeeDB';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmployeeService {
-  constructor(private employeeDBService: EmployeeDBService) {}
+  constructor(private indexedDBService: IndexedDBService) {} 
+  // Inject IndexedDBService để thao tác với cơ sở dữ liệu
 
-  getEmployees(): Promise<Employee[]> {
-    return this.employeeDBService.getEmployees();
+  // Lấy danh sách tất cả nhân viên từ IndexedDB
+  async getEmployees(): Promise<Employee[]> {
+    const db = await this.indexedDBService.getDB(); // Kết nối tới cơ sở dữ liệu
+    return db.transaction('employees').objectStore('employees').getAll(); 
   }
 
-  addEmployee(employee: Employee): Promise<IDBValidKey> {
-    return this.employeeDBService.addEmployee(employee);
+  // Lấy thông tin nhân viên theo ID
+  async getEmployeeById(id: number): Promise<Employee | undefined> {
+    const db = await this.indexedDBService.getDB();
+    return db.transaction('employees').objectStore('employees').get(id);
   }
 
-  updateEmployee(employee: Employee): Promise<IDBValidKey> {
-    return this.employeeDBService.updateEmployee(employee);
+  // Thêm nhân viên mới vào cơ sở dữ liệu
+  async addEmployee(employee: Employee): Promise<IDBValidKey> {
+    const db = await this.indexedDBService.getDB();
+    return db.transaction('employees', 'readwrite').objectStore('employees').add(employee);
   }
 
-  deleteEmployee(id: number): Promise<void> {
-    return this.employeeDBService.deleteEmployee(id);
+  // Cập nhật thông tin nhân viên
+  async updateEmployee(employee: Employee): Promise<IDBValidKey> {
+    const db = await this.indexedDBService.getDB();
+    return db.transaction('employees', 'readwrite').objectStore('employees').put(employee);
+  }
+
+  // Xóa nhân viên theo ID
+  async deleteEmployee(id: number): Promise<void> {
+    const db = await this.indexedDBService.getDB();
+    return db.transaction('employees', 'readwrite').objectStore('employees').delete(id);
   }
 }

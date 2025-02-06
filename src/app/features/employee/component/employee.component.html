@@ -121,9 +121,11 @@
       <li class="employee_list">{{ employee.hometown }}</li>
       <li class="employee_list">{{ employee.dob | date:'dd/MM/yyyy' }}</li>
       <li class="employee_list">{{ getEmployeeTypeLabel(employee.employeeType) }}</li>
-      <li class="employee_list">{{ getWorkStatusLabel(employee.workStatus) }}</li>
+      <li class="employee_list" [ngClass]="{'status-working': employee.workStatus === 1, 'status-left': employee.workStatus === 2}">
+        {{ getWorkStatusLabel(employee.workStatus) }}
+      </li>
       <li class="employee_list">
-        <!-- <div class="dropend">
+        <div class="dropend">
           <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-gears"></i>
           </button>
@@ -131,10 +133,6 @@
             <li><button class="dropdown-item employee_btn" (click)="openModal(employee)">Sửa</button></li>
             <li><button class="dropdown-item employee_btn" (click)="openConfirmDeleteModal(employee.id)">Xóa</button></li>
           </ul>
-        </div> -->
-        <div class="employee_list_act">
-          <li><button class="dropdown-item employee_btn" (click)="openModal(employee)">Sửa</button></li>
-          <li><button class="dropdown-item employee_btn" (click)="openConfirmDeleteModal(employee.id)">Xóa</button></li>
         </div>
       </li>
     </ul>
