@@ -1,4 +1,5 @@
 export interface Employee {
+  createdAt?: string; 
   id: number;
   name: string;
   gender: number; 
@@ -6,7 +7,6 @@ export interface Employee {
   dob: string;
   phone: string;
   employeeType: number;
-  workStatus: number;
-  createdAt?: string; 
   department: number;
+  workStatus: number;
 }
