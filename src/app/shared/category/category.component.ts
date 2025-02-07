@@ -11,7 +11,7 @@ import { RouterLink } from "@angular/router";
 export class CategoryComponent implements OnInit {
   menuItems = [
     { name: 'Nhiệm vụ', icon: 'fa-solid fa-bars-progress', routerLink: '/task' },
-    { name: 'Cài Đặt', icon: 'fa-solid fa-gears', routerLink: '/comingsoon' }
+    { name: 'Cài Đặt', icon: 'fa-solid fa-gears', routerLink: '/' }
   ];
 
   subMenuItems = [

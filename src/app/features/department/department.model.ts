@@ -1,7 +1,6 @@
 export interface Department {
-    id?: number;
+    id: number;
     name: string;
-    description: string; 
-    status: string;
-  }
-  
+    description: string;
+    workStatus: { id: number, name: string };
+}

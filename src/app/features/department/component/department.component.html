@@ -1,1 +1,100 @@
-<p>department works!</p>
+<div class="department">
+  <div class="department_title">
+    <h1>Danh sách phòng ban</h1>
+  </div>
+
+  <div class="employee_search">
+    <input 
+      class="search_inp" 
+      type="text" 
+      placeholder="Tìm kiếm phòng ban theo tên..." 
+      [(ngModel)]="searchTerm"
+      (input)="onSearchTermChange()"
+    />
+  </div>
+
+  <button class="department_add_btn" (click)="openModal(content)">Thêm phòng ban</button>
+    
+  <ng-template #content let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title" id="modal-basic-title">{{ isEditing ? 'Cập nhật phòng ban' : 'Thêm phòng ban' }}</h5>
+      <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="closeModal(modal)"></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Mã phòng ban</label>
+        <input class="form-control" [(ngModel)]="newDepartment.id" placeholder="Mã phòng ban" disabled />
+      </div>
+      <div class="form-group">
+        <label>Tên phòng ban</label>
+        <input class="form-control" [(ngModel)]="newDepartment.name" placeholder="Tên phòng ban" />
+      </div>
+      <div class="form-group">
+        <label>Mô tả</label>
+        <input class="form-control" [(ngModel)]="newDepartment.description" placeholder="Mô tả" />
+      </div>
+      <div class="form-group">
+        <label>Trạng Thái</label>
+        <select class="form-control" [(ngModel)]="newDepartment.workStatus">
+          <option *ngFor="let status of workStatuses" [ngValue]="status">{{ status.name }}</option>
+        </select>
+      </div>
+      <div *ngIf="validationMessage" class="alert alert-danger">{{ validationMessage }}</div>
+    </div>
+    <div class="modal-footer modal_footer_ctm">
+      <button type="button" class="btn btn-secondary" (click)="closeModal(modal)">Đóng</button>
+      <button type="button" class="btn modal-footer-cancel" (click)="addOrUpdateDepartment(modal)">{{ isEditing ? 'Cập nhật' : 'Thêm' }}</button>
+    </div>
+  </ng-template>
+
+  <ng-template #deleteModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Xác nhận xóa</h5>
+      <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      Bạn có chắc chắn muốn xóa phòng ban này không?
+    </div>
+    <div class="modal-footer modal_footer_ctm">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Hủy</button>
+      <button type="button" class="btn modal-footer-cancel" (click)="confirmDelete(modal)">Xóa</button>
+    </div>
+  </ng-template>
+    
+  <div class="department_table">
+    <ul class="department_info">
+      <li (click)="setSortField('id')">Mã phòng ban <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li (click)="setSortField('name')">Tên phòng ban <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li (click)="setSortField('description')">Mô tả <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li (click)="setSortField('workStatus.name')">Trạng thái <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li>Hành Động</li>
+    </ul>
+    <ul class="department_lists" *ngFor="let dept of departments">
+      <li class="department_list">{{ dept.id }}</li>
+      <li class="department_list">{{ dept.name }}</li>
+      <li class="department_list">{{ dept.description }}</li>
+      <li class="department_list" [ngClass]="{'status-active': dept.workStatus.id === 1, 'status-inactive': dept.workStatus.id === 2}">
+        {{ dept.workStatus.name }}
+      </li>
+      <li class="department_list">
+        <div class="dropend">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-gears"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><button class="dropdown-item department_btn" (click)="editDepartment(dept, content)">Sửa</button></li>
+            <li><button class="dropdown-item department_btn" (click)="openDeleteModal(dept.id, deleteModal)">Xóa</button></li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pagination">
+    <button (click)="goToFirstPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><<</button>
+    <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><</button>
+    <span>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} / {{ totalItems }}</span>
+    <button (click)="goToNextPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">></button>
+    <button (click)="goToLastPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">>></button>
+  </div>
+</div>

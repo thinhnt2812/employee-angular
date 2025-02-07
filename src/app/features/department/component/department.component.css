@@ -1,0 +1,257 @@
+.department {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 60px;
+    margin-left: 12%;
+    font-family: Arial, sans-serif;
+}
+
+.department_title{
+    padding: 16px 0;
+}
+
+.department_title h1{
+    font-weight: bold;
+}
+
+.employee_search{
+    margin-bottom: 50px;
+}
+
+.search_inp{
+    width: 220px;
+    padding: 8px; 
+    border: 0.1px solid #ccc; 
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-right: 0;
+}
+
+.search_inp:focus{
+    border-color: #6372b6;
+    box-shadow: 0 0 5px rgba(42, 106, 202, 0.5);
+}
+
+.search_inp::placeholder{
+    color: #aaa;
+    font-style: italic;
+}
+
+.department_add_btn{
+    background-color: #2D336B;
+    color: #fff;
+    opacity: 0.8;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    position: absolute;
+    right: 10%;
+    top: 176px;
+}
+
+.department_add_btn:hover {
+    opacity: 0.9;
+}
+
+.department_table {
+    width: 90%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    opacity: 0; 
+    transform: scale(0); 
+    animation: scaleUp .2s ease-out forwards;
+}
+
+@keyframes scaleUp {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.department_info {
+    display: flex;
+    text-align: center;
+    background-color: #2D336B;
+    color: #fff;
+    font-weight: bold;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+.department_info li {
+    list-style: none;
+    width: 15%; 
+    user-select: none;
+}
+
+.department_info li:nth-child(3){
+    width: 40%;
+}
+
+.department_info li:hover{
+    cursor: pointer;
+    color: #F4D793;
+}
+
+.department_info li:last-child{
+    cursor: default;
+    color: #fff;
+}
+
+.department_lists {
+    display: flex;
+    text-align: center;
+    padding: 6px;
+    margin: 8px 0;
+    background-color: rgba(10, 13, 187, 0.05);
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.department_lists:hover {
+    background-color: rgba(10, 13, 187, 0.15);
+}
+
+.department_list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 15%;
+    font-size: 14px;
+    color: #333;
+    list-style: none;
+}
+
+.department_list:nth-child(3){
+    width: 40%;
+}
+
+.department_list:first-child {
+    font-weight: bold;
+    color: #2D336B;
+}
+
+.department_list .btn{
+    width: 60px;
+    height: 35px;
+}
+
+.department_list .dropdown-menu {
+    border: none;
+    padding: 0;
+    min-width: 50px;
+    text-align: center;
+    background-color: transparent;
+    inset: -13px auto auto 4px !important;
+}
+
+.department_btn {
+    text-align: center;
+    background-color: #727a83;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s ease;
+}
+
+.department_btn:hover {
+    background-color: #2D336B;
+}
+
+.department_btn:first-child{
+    margin-bottom: 6px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-control:focus {
+    border-color: #4da6ff;
+    box-shadow: 0 0 5px rgba(77, 166, 255, 0.5); 
+}
+
+.modal-footer-cancel{
+    color: #fff;
+    background-color: #2D336B;
+}
+
+.modal-footer-cancel:hover{
+    background-color: #414b9e;
+}
+
+.modal-footer-cancel:focus{
+    color: #fff;
+}
+
+.modal_footer_ctm{
+    padding: 4px;
+}
+
+.modal_body_lable p{
+    margin-bottom: 0;
+}
+
+.btn_close_ctm:focus, .btn_close_ctm:active{
+    box-shadow: none;
+}
+
+.status-active {
+    background-color: #809D3C;
+    border-radius: 16px;
+    color: white;
+}
+
+.status-inactive {
+    background-color: #AF1740;
+    border-radius: 16px;
+    color: white;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: #2D336B;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 2px 12px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+    background-color: #575C89;
+}
+
+.pagination button.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+    font-size: 14px;
+}
