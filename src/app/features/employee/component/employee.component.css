@@ -15,7 +15,7 @@
 }
 
 .employee_search{
-    margin-bottom: 50px;
+    margin-bottom: 100px;
 }
 
 .search_inp{
@@ -46,13 +46,54 @@
     padding: 10px;
     border: none;
     border-radius: 5px;
-    position: absolute;
-    right: 10%;
-    top: 176px;
+    width: 160px;
+    height: 44px;
 }
 
 .employee_add_btn:hover {
     opacity: 0.9;
+}
+
+.employee_filters {
+    position: absolute;
+    right: 10%;
+    top: 210px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.employee_filters select {
+    font-weight: 500;
+    font-style: italic;
+}
+
+.employee_filters select:focus {
+    border-color: #ff5733;
+    box-shadow: 0 0 5px rgba(255, 87, 51, 0.5);
+}
+
+.filter_department,
+.filter_status{
+    width: 180px;
+}
+
+.filter_department p,
+.filter_status p{
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #8B0000;
+}
+
+.employee_table {
+    width: 90%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    opacity: 0; 
+    transform: scale(0); 
+    animation: scaleUp .2s ease-out forwards;
 }
 
 .employee_table {
@@ -89,7 +130,7 @@
 
 .employee_info li {
     list-style: none;
-    width: calc(100%/10); /* Adjust width to accommodate new column */
+    width: calc(100%/10);
     user-select: none;
 }
 
@@ -121,7 +162,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: calc(100%/10); /* Adjust width to accommodate new column */
+    width: calc(100%/10);
     font-size: 14px;
     color: #333;
     list-style: none;

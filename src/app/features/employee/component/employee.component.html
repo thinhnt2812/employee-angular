@@ -13,7 +13,24 @@
     />
   </div>
 
-  <button class="employee_add_btn" (click)="openModal()">Thêm Nhân Viên</button>
+  <div class="employee_filters">
+    <div class="filter_department">
+      <p>Lọc theo phòng ban:</p>
+      <select [(ngModel)]="filterDepartment" (change)="onFilterChange()" class="form-control">
+        <option [ngValue]="null">Tất cả phòng ban</option>
+        <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+      </select>
+    </div>
+    <div class="filter_status">
+      <p>Lọc theo trạng thái:</p>
+      <select [(ngModel)]="filterWorkStatus" (change)="onFilterChange()" class="form-control">
+        <option [ngValue]="null">Tất cả trạng thái</option>
+        <option *ngFor="let status of workStatus" [ngValue]="status.id">{{ status.name }}</option>
+      </select>
+    </div>
+    <button class="employee_add_btn" (click)="openModal()">Thêm Nhân Viên</button>
+  </div>
+
 
   <ng-template #employeeModal let-modal>
     <div class="modal-header">
@@ -57,7 +74,7 @@
       </div>
       <div class="form-group">
         <label>Phòng Ban</label>
-        <select class="form-control" [(ngModel)]="currentEmployee.department" required>
+        <select [(ngModel)]="currentEmployee.department" class="form-control">
           <option *ngFor="let department of departments" [value]="department.id">{{ department.name }}</option>
         </select>
       </div>

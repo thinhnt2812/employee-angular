@@ -192,6 +192,10 @@
     background-color: #2D336B;
 }
 
+.alert{
+    margin-bottom: 0;
+}
+
 .modal-footer-cancel:hover{
     background-color: #414b9e;
 }

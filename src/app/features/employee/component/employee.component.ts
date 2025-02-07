@@ -62,11 +62,10 @@ export class EmployeeManagementComponent implements OnInit {
     { id: 2, name: 'Đã nghỉ' }
   ];
 
-  departments: { id: number, name: string }[] = [
-    { id: 1, name: 'Phòng Giám Đốc' },
-    { id: 2, name: 'Phòng Kỹ Thuật' },
-    { id: 3, name: 'Phòng Kế Toán' }
-  ];
+  departments: { id: number, name: string }[] = [];
+
+  filterDepartment: number | null = null;
+  filterWorkStatus: number | null = null;
 
   constructor(
     private employeeService: EmployeeService,
@@ -80,6 +79,16 @@ export class EmployeeManagementComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
       this.fetchEmployees();
+    });
+    this.fetchDepartments(); // Lấy danh sách phòng ban khi khởi tạo
+  }
+
+  private fetchDepartments(): void {
+    // Hàm này lấy danh sách phòng ban từ service
+    this.employeeService.getDepartments().then(data => {
+      this.departments = data
+        .filter(dept => dept.workStatus.id === 1) // Chỉ lấy những phòng ban đang hoạt động
+        .map(dept => ({ id: dept.id, name: dept.name }));
     });
   }
 
@@ -102,8 +111,10 @@ export class EmployeeManagementComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     const filteredList = this.searchKeyword.trim() ? this.filterEmployees() : this.originalEmployeeList;
-    this.employeeList = filteredList.slice(startIndex, endIndex);
-    this.totalItems = filteredList.length;
+    const departmentFilteredList = this.filterDepartment ? filteredList.filter(emp => emp.department === this.filterDepartment) : filteredList;
+    const workStatusFilteredList = this.filterWorkStatus ? departmentFilteredList.filter(emp => emp.workStatus === this.filterWorkStatus) : departmentFilteredList;
+    this.employeeList = workStatusFilteredList.slice(startIndex, endIndex);
+    this.totalItems = workStatusFilteredList.length;
     this.updateUrl();
   }
 
@@ -177,6 +188,7 @@ export class EmployeeManagementComponent implements OnInit {
   }
 
   private getVietnamTime(): string {
+    // Hàm này trả về thời gian hiện tại ở Việt Nam
     const now = new Date();
     now.setHours(now.getHours() + 7); // Điều chỉnh múi giờ UTC+7
     return now.toISOString().replace('T', ' ').substring(0, 19);
@@ -343,5 +355,11 @@ export class EmployeeManagementComponent implements OnInit {
     // Hàm này mở modal xác nhận xóa nhân viên
     this.employeeIdToDelete = id;
     this.modalService.open(this.confirmDeleteModal);
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
+    this.updateEmployeeList();
+    this.updateUrl();
   }
 }

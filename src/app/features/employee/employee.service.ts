@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { IndexedDBService } from '../../service/employee-indexedDB';
+import { IndexedDBService } from '../../service/indexeddb.service';
 import { Employee } from './employee.model';
+import { DepartmentService } from '../department/department.service'; // Import DepartmentService
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmployeeService {
-  constructor(private indexedDBService: IndexedDBService) {} 
+  constructor(
+    private indexedDBService: IndexedDBService,
+    private departmentService: DepartmentService
+  ) {} 
   // Inject IndexedDBService để thao tác với cơ sở dữ liệu
 
   // Lấy danh sách tất cả nhân viên từ IndexedDB
@@ -37,5 +41,10 @@ export class EmployeeService {
   async deleteEmployee(id: number): Promise<void> {
     const db = await this.indexedDBService.getDB();
     return db.transaction('employees', 'readwrite').objectStore('employees').delete(id);
+  }
+
+  // Lấy danh sách các phòng ban
+  async getDepartments() {
+    return this.departmentService.getDepartments();
   }
 }

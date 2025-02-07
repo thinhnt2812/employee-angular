@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IndexedDBService } from '../../service/department-indexedDB';
+import { IndexedDBService } from '../../service/indexeddb.service';
 import { Department } from './department.model';
 
 @Injectable({ providedIn: 'root' })

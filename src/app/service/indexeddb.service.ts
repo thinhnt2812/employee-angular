@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { openDB, IDBPDatabase } from 'idb';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class IndexedDBService {
   private dbPromise: Promise<IDBPDatabase>;
 
@@ -13,13 +15,18 @@ export class IndexedDBService {
    * Khởi tạo cơ sở dữ liệu IndexedDB
    */
   private async initDB(): Promise<IDBPDatabase> {
-    return openDB('DepartmentDB', 1, {
+    return openDB('CompanyDB', 1, {
       upgrade(db) {
+        // Tạo bảng 'employees' nếu chưa tồn tại
+        if (!db.objectStoreNames.contains('employees')) {
+          db.createObjectStore('employees', { keyPath: 'id', autoIncrement: true });
+        }
+        
         // Tạo bảng 'departments' nếu chưa tồn tại
         if (!db.objectStoreNames.contains('departments')) {
           db.createObjectStore('departments', { keyPath: 'id' });
         }
-      }
+      },
     });
   }
 
