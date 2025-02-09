@@ -26,6 +26,11 @@ export class IndexedDBService {
         if (!db.objectStoreNames.contains('departments')) {
           db.createObjectStore('departments', { keyPath: 'id' });
         }
+
+        // Tạo bảng 'task' nếu chưa tồn tại
+        if (!db.objectStoreNames.contains('tasks')) {
+          db.createObjectStore('tasks', { keyPath: 'id' });
+        }
       },
     });
   }

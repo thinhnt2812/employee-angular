@@ -52,9 +52,13 @@ export class EmployeeManagementComponent implements OnInit {
   ];
 
   employeeType: { id: number, name: string }[] = [
-    { id: 1, name: 'Trưởng phòng' },
-    { id: 2, name: 'kế toán' },
-    { id: 3, name: 'Nhân viên' }
+    { id: 1, name: 'Giám đốc' },
+    { id: 2, name: 'Trưởng phòng' },
+    { id: 3, name: 'Kế toán' },
+    { id: 4, name: 'Trưởng nhóm' },
+    { id: 5, name: 'Nhân viên' },
+    { id: 6, name: 'Kỹ sư phần mềm' },
+    { id: 7, name: 'Kiểm thử phần mềm' }
   ];
 
   workStatus: { id: number, name: string }[] = [
