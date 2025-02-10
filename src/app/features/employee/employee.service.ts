@@ -1,49 +1,69 @@
 import { Injectable } from '@angular/core';
 import { IndexedDBService } from '../../service/indexeddb.service';
 import { Employee } from './employee.model';
-import { DepartmentService } from '../department/department.service'; // Import DepartmentService
+import { DepartmentService } from '../department/department.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmployeeService {
+  private dbPromise: Promise<any>;
+
   constructor(
     private indexedDBService: IndexedDBService,
     private departmentService: DepartmentService
-  ) {} 
-  // Inject IndexedDBService để thao tác với cơ sở dữ liệu
+  ) {
+    this.dbPromise = this.indexedDBService.getDB();
+  }
 
-  // Lấy danh sách tất cả nhân viên từ IndexedDB
+  // Lấy đối tượng cơ sở dữ liệu
+  private async getDB() {
+    return this.dbPromise;
+  }
+
+  // Tạo giao dịch với cơ sở dữ liệu
+  private async transaction(storeName: string, mode: IDBTransactionMode) {
+    const db = await this.getDB();
+    return db.transaction(storeName, mode).objectStore(storeName);
+  }
+
+  // Lấy tất cả các nhân viên
   async getEmployees(): Promise<Employee[]> {
-    const db = await this.indexedDBService.getDB(); // Kết nối tới cơ sở dữ liệu
-    return db.transaction('employees').objectStore('employees').getAll(); 
+    return await (await this.transaction('employees', 'readonly')).getAll();
   }
 
-  // Lấy thông tin nhân viên theo ID
+  // Lấy nhân viên theo ID
   async getEmployeeById(id: number): Promise<Employee | undefined> {
-    const db = await this.indexedDBService.getDB();
-    return db.transaction('employees').objectStore('employees').get(id);
+    return await (await this.transaction('employees', 'readonly')).get(id);
   }
 
-  // Thêm nhân viên mới vào cơ sở dữ liệu
+  // Thêm nhân viên mới
   async addEmployee(employee: Employee): Promise<IDBValidKey> {
-    const db = await this.indexedDBService.getDB();
-    return db.transaction('employees', 'readwrite').objectStore('employees').add(employee);
+    const store = await this.transaction('employees', 'readwrite');
+    const tx = store.transaction;
+    const id = await store.add(employee);
+    await tx.done;
+    return id;
   }
 
-  // Cập nhật thông tin nhân viên
+  // Cập nhật nhân viên
   async updateEmployee(employee: Employee): Promise<IDBValidKey> {
-    const db = await this.indexedDBService.getDB();
-    return db.transaction('employees', 'readwrite').objectStore('employees').put(employee);
+    const store = await this.transaction('employees', 'readwrite');
+    const tx = store.transaction;
+    const id = await store.put(employee);
+    await tx.done;
+    return id;
   }
 
   // Xóa nhân viên theo ID
   async deleteEmployee(id: number): Promise<void> {
-    const db = await this.indexedDBService.getDB();
-    return db.transaction('employees', 'readwrite').objectStore('employees').delete(id);
+    const store = await this.transaction('employees', 'readwrite');
+    const tx = store.transaction;
+    await store.delete(id);
+    await tx.done;
   }
 
-  // Lấy danh sách các phòng ban
+  // Lấy tất cả các phòng ban
   async getDepartments() {
     return this.departmentService.getDepartments();
   }

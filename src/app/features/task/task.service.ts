@@ -1,65 +1,69 @@
 import { Injectable } from '@angular/core';
 import { IndexedDBService } from '../../service/indexeddb.service';
 import { Task } from './task.model';
-import { Department } from '../department/department.model'; 
+import { Department } from '../department/department.model';
 import { Employee } from '../employee/employee.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  constructor(private indexedDBService: IndexedDBService) {}
+  private dbPromise: Promise<any>;
 
-  // Phương thức lấy database từ IndexedDBService
+  constructor(private indexedDBService: IndexedDBService) {
+    this.dbPromise = this.indexedDBService.getDB();
+  }
+
+  // Lấy đối tượng cơ sở dữ liệu
   private async getDB() {
-    return this.indexedDBService.getDB();
+    return this.dbPromise;
   }
 
-  // Lấy ID tiếp theo cho nhiệm vụ mới
+  // Tạo giao dịch với cơ sở dữ liệu
+  private async transaction(storeName: string, mode: IDBTransactionMode) {
+    const db = await this.getDB();
+    return db.transaction(storeName, mode).objectStore(storeName);
+  }
+
+  // Lấy ID tiếp theo cho task mới
   async getNextTaskId(): Promise<number> {
-    const db = await this.getDB();
-    const tasks = await db.getAll('tasks');
-    return (tasks.length ? Math.max(...tasks.map(t => t.id)) : 0) + 1;
+    const store = await this.transaction('tasks', 'readonly');
+    const count = await store.count();
+    return count + 1;
   }
 
-  // Lấy danh sách tất cả các nhiệm vụ
+  // Lấy tất cả các task
   async getTasks(): Promise<Task[]> {
-    const db = await this.getDB();
-    return await db.getAll('tasks');
+    return await (await this.transaction('tasks', 'readonly')).getAll();
   }
 
-  // Thêm một nhiệm vụ mới vào cơ sở dữ liệu
+  // Thêm task mới
   async addTask(task: Task) {
     task.id = await this.getNextTaskId();
-    const db = await this.getDB();
-    const tx = db.transaction('tasks', 'readwrite');
-    tx.objectStore('tasks').put(task);
-    await tx.done;
+    await (await this.transaction('tasks', 'readwrite')).put(task);
   }
 
-  // Cập nhật thông tin nhiệm vụ
+  // Cập nhật task
   async updateTask(task: Task) {
-    const db = await this.getDB();
-    const tx = db.transaction('tasks', 'readwrite');
-    tx.objectStore('tasks').put(task);
-    await tx.done;
+    await (await this.transaction('tasks', 'readwrite')).put(task);
   }
 
-  // Xóa nhiệm vụ theo ID
+  // Xóa task theo ID
   async deleteTask(id: number) {
-    const db = await this.getDB();
-    const tx = db.transaction('tasks', 'readwrite');
-    tx.objectStore('tasks').delete(id);
-    await tx.done;
+    await (await this.transaction('tasks', 'readwrite')).delete(id);
   }
 
-  // Lấy danh sách tất cả các phòng ban
+  // Lấy tất cả các phòng ban
   async getDepartments(): Promise<Department[]> {
-    const db = await this.getDB();
-    return await db.getAll('departments');
+    return await (await this.transaction('departments', 'readonly')).getAll();
   }
 
-  // Lấy danh sách tất cả các nhân viên
+  // Lấy tất cả các nhân viên
   async getEmployees(): Promise<Employee[]> {
-    const db = await this.getDB();
-    return await db.getAll('employees');
+    return await (await this.transaction('employees', 'readonly')).getAll();
+  }
+
+  // Lấy nhân viên theo phòng ban
+  async getEmployeesByDepartment(departmentId: number): Promise<Employee[]> {
+    const employees = await this.getEmployees();
+    return employees.filter(emp => emp.department === departmentId);
   }
 }

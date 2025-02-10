@@ -1,8 +1,10 @@
 <div class="task">
+  <!-- Tiêu đề -->
   <div class="task_title">
     <h1>Danh sách nhiệm vụ</h1>
   </div>
 
+  <!-- Tìm kiếm -->
   <div class="task_search">
     <input 
       class="search_inp" 
@@ -13,6 +15,7 @@
     />
   </div>
 
+  <!-- Bộ lọc -->
   <div class="task_filters">
     <button class="task_add_btn" (click)="openModal(content)">Thêm nhiệm vụ</button>
     <div class="filter_status">
@@ -26,7 +29,7 @@
       <p>Lọc theo phòng ban:</p>
       <select class="filter_select" [(ngModel)]="selectedDepartment" (change)="onFilterChange()">
         <option value="">Tất cả phòng ban</option>
-        <option *ngFor="let department of departments" [ngValue]="department.name">{{ department.name }}</option>
+        <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
       </select>
     </div>
     <div class="filter_priority">
@@ -63,8 +66,8 @@
       </div>
       <div class="form-group">
         <label>Phòng ban nhận nhiệm vụ</label>
-        <select class="form-control" [(ngModel)]="newTask.department">
-          <option *ngFor="let department of departments" [ngValue]="department.name">{{ department.name }}</option>
+        <select class="form-control" [(ngModel)]="newTask.department" (ngModelChange)="loadEmployeesByDepartment($event)">
+          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
         </select>
       </div>
       <div class="form-group">
@@ -106,6 +109,7 @@
     </div>
   </ng-template>
     
+  <!-- Danh sách nhiệm vụ -->
   <div class="task_table">
     <ul class="task_info">
       <li (click)="setSortField('id')">Mã nhiệm vụ <i class="fa-solid fa-arrows-up-down"></i></li>
@@ -123,7 +127,7 @@
       <li class="task_list">{{ task.name }}</li>
       <li class="task_list">{{ task.description }}</li>
       <li class="task_list">{{ task.priority }}</li>
-      <li class="task_list">{{ task.department }}</li>
+      <li class="task_list">{{ getDepartmentName(task.department) }}</li>
       <li class="task_list">{{ task.assignee }}</li>
       <li class="task_list">{{ task.dueDate | date:'dd/MM/yyyy' }}</li>
       <li class="task_list" [ngClass]="{
@@ -150,6 +154,7 @@
     </ul>
   </div>
 
+  <!-- Phân trang -->
   <div class="pagination">
     <button (click)="goToFirstPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><<</button>
     <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><</button>

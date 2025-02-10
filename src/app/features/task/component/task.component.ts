@@ -60,7 +60,7 @@ export class TaskComponent implements OnInit {
     this.tasks = allTasks
       .filter(task => 
         (!this.searchTerm.trim() || task.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
-        (!this.selectedDepartment || task.department === this.selectedDepartment) &&
+        (!this.selectedDepartment || task.department === +this.selectedDepartment) &&
         (!this.selectedStatus || task.status.id === this.selectedStatus) &&
         (!this.selectedPriority || task.priority === this.selectedPriority)
       )
@@ -74,9 +74,21 @@ export class TaskComponent implements OnInit {
     this.departments = allDepartments.filter(department => department.workStatus.id === 1);
   }
 
+  // Lấy tên phòng ban theo ID
+  getDepartmentName(departmentId: number): string {
+    const department = this.departments.find(dept => dept.id === departmentId);
+    return department ? department.name : 'Không xác định';
+  }
+  
   // Tải danh sách nhân viên từ service
   async loadEmployees() {
     this.employees = await this.taskService.getEmployees();
+  }
+
+  // Tải danh sách nhân viên theo phòng ban
+  async loadEmployeesByDepartment(departmentId: number) {
+    const allEmployees = await this.taskService.getEmployeesByDepartment(departmentId);
+    this.employees = allEmployees.filter(employee => employee.workStatus === 1);
   }
 
   // Sắp xếp danh sách nhiệm vụ theo trường và hướng sắp xếp
@@ -117,7 +129,7 @@ export class TaskComponent implements OnInit {
 
   // Thêm hoặc cập nhật nhiệm vụ, sau đó đóng modal
   async addOrUpdateTask(modal: any) {
-    if (!this.newTask.name.trim() || !this.newTask.description.trim() || !this.newTask.department.trim() || !this.newTask.assignee.trim() || !this.newTask.dueDate.trim()) {
+    if (!this.newTask.name.trim() || !this.newTask.description.trim() || !this.newTask.department || !this.newTask.assignee.trim() || !this.newTask.dueDate.trim()) {
       this.validationMessage = 'Vui lòng nhập đầy đủ thông tin.';
       return;
     }
@@ -133,6 +145,7 @@ export class TaskComponent implements OnInit {
     }
     this.resetForm();
     modal.close();
+    this.loadEmployees(); // Load lại danh sách nhân viên sau khi thêm hoặc cập nhật nhiệm vụ
   }
 
   // Xóa nhiệm vụ dựa trên ID
@@ -147,6 +160,7 @@ export class TaskComponent implements OnInit {
     this.newTask = { ...task };
     this.isEditing = true;
     this.setStatus(task.status.id);
+    this.loadEmployeesByDepartment(task.department); // Load nhân viên theo phòng ban khi chỉnh sửa nhiệm vụ
     this.openModal(content);
   }
 
@@ -195,7 +209,7 @@ export class TaskComponent implements OnInit {
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
   private getEmptyTask(): Task {
-    return { id: 0, name: '', description: '', priority: 1, department: '', dueDate: '', assignee: '', status: this.statuses[0] };
+    return { id: 0, name: '', description: '', priority: 1, department: 0, dueDate: '', assignee: '', status: this.statuses[0] };
   }
 
   // Đặt lại biểu mẫu sau khi thêm hoặc cập nhật nhiệm vụ
@@ -203,6 +217,7 @@ export class TaskComponent implements OnInit {
     this.isEditing = false;
     this.newTask = this.getEmptyTask();
     this.setNextTaskId();
+    this.loadEmployees(); // Load lại danh sách nhân viên khi đặt lại biểu mẫu
   }
 
   // Chuyển đến trang đầu tiên

@@ -6,6 +6,7 @@
     top: 52px;
     background-color: #252B36;
     color: #fff;
+    user-select: none;
 }
 
 .list_menu{
