@@ -7,6 +7,7 @@ import { DepartmentService } from '../department/department.service';
   providedIn: 'root',
 })
 export class EmployeeService {
+  // Biến lưu trữ đối tượng cơ sở dữ liệu
   private dbPromise: Promise<any>;
 
   constructor(

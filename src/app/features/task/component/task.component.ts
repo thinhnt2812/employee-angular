@@ -6,10 +6,11 @@ import { Employee } from '../../employee/employee.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
 
 @Component({
   selector: 'app-task',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css']
 })
@@ -220,31 +221,9 @@ export class TaskComponent implements OnInit {
     this.loadEmployees(); // Load lại danh sách nhân viên khi đặt lại biểu mẫu
   }
 
-  // Chuyển đến trang đầu tiên
-  goToFirstPage() {
-    this.currentPage = 1;
-    this.loadTasks();
-  }
-
-  // Chuyển đến trang trước
-  goToPreviousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadTasks();
-    }
-  }
-
-  // Chuyển đến trang tiếp theo
-  goToNextPage() {
-    if (this.currentPage * this.itemsPerPage < this.totalItems) {
-      this.currentPage++;
-      this.loadTasks();
-    }
-  }
-
-  // Chuyển đến trang cuối cùng
-  goToLastPage() {
-    this.currentPage = Math.ceil(this.totalItems / this.itemsPerPage);
+  // Hàm này xử lý thay đổi trang
+  onPageChange(page: number): void {
+    this.currentPage = page;
     this.loadTasks();
   }
 

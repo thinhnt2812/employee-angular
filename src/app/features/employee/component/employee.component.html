@@ -2,33 +2,36 @@
   <div class="employee_title">
     <h1>Danh sách nhân viên</h1>
   </div>
-
-  <div class="employee_search">
-    <input 
-      class="search_inp" 
-      type="text" 
-      [(ngModel)]="searchKeyword" 
-      (ngModelChange)="onSearch()" 
-      placeholder="Tìm kiếm nhân viên theo tên..." 
-    />
-  </div>
-
+  
   <div class="employee_filters">
-    <div class="filter_department">
-      <p>Lọc theo phòng ban:</p>
-      <select [(ngModel)]="filterDepartment" (change)="onFilterChange()" class="form-control">
-        <option [ngValue]="null">Tất cả phòng ban</option>
-        <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
-      </select>
+    <div class="employee_search">
+      <input 
+        class="search_inp" 
+        type="text" 
+        [(ngModel)]="searchKeyword" 
+        (ngModelChange)="onSearch()" 
+        placeholder="Tìm kiếm nhân viên theo tên..." 
+      />
+      <button class="employee_btns" (click)="confirmSearch()">Tìm kiếm</button>
     </div>
-    <div class="filter_status">
-      <p>Lọc theo trạng thái:</p>
-      <select [(ngModel)]="filterWorkStatus" (change)="onFilterChange()" class="form-control">
-        <option [ngValue]="null">Tất cả trạng thái</option>
-        <option *ngFor="let status of workStatus" [ngValue]="status.id">{{ status.name }}</option>
-      </select>
+    <div class="filter_emp">
+      <div class="filter_department">
+        <p>Lọc theo phòng ban:</p>
+        <select [(ngModel)]="filterDepartment" (change)="onFilterChange()" class="form-control">
+          <option [ngValue]="null">Tất cả phòng ban</option>
+          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+        </select>
+      </div>
+      <div class="filter_status">
+        <p>Lọc theo trạng thái:</p>
+        <select [(ngModel)]="filterWorkStatus" (change)="onFilterChange()" class="form-control">
+          <option [ngValue]="null">Tất cả trạng thái</option>
+          <option *ngFor="let status of workStatus" [ngValue]="status.value">{{ status.label }}</option>
+        </select>
+      </div>
+      <button class="employee_btns" (click)="confirmFilter()">Xác nhận</button>
     </div>
-    <button class="employee_add_btn" (click)="openModal()">Thêm Nhân Viên</button>
+    <button class="employee_btns" (click)="openModal()">Thêm Nhân Viên</button>
   </div>
 
 
@@ -49,7 +52,7 @@
       <div class="form-group">
         <label>Giới Tính</label>
         <select class="form-control" [(ngModel)]="currentEmployee.gender" required>
-          <option *ngFor="let gender of gender" [value]="gender.id">{{ gender.name }}</option>
+          <option *ngFor="let gender of gender" [value]="gender.value">{{ gender.label }}</option>
         </select>
       </div>
       <div class="form-group">
@@ -69,7 +72,7 @@
       <div class="form-group">
         <label>Chức Vụ</label>
         <select class="form-control" [(ngModel)]="currentEmployee.employeeType" required>
-          <option *ngFor="let employeeType of employeeType" [value]="employeeType.id">{{ employeeType.name }}</option>
+          <option *ngFor="let employeeType of employeeType" [value]="employeeType.value">{{ employeeType.label }}</option>
         </select>
       </div>
       <div class="form-group">
@@ -81,7 +84,7 @@
       <div class="form-group">
         <label>Trạng Thái</label>
         <select class="form-control" [(ngModel)]="currentEmployee.workStatus" required>
-          <option *ngFor="let workStatus of workStatus" [value]="workStatus.id">{{ workStatus.name }}</option>
+          <option *ngFor="let workStatus of workStatus" [value]="workStatus.value">{{ workStatus.label }}</option>
         </select>
       </div>
     </div>
@@ -120,15 +123,15 @@
 
   <div class="employee_table">
     <ul class="employee_info">
-      <li (click)="sortEmployeesByIdDesc()">Mã NV <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('name')">Họ Và Tên <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('gender')">Giới Tính <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('phone')">Số Điện Thoại <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('hometown')">Quê Quán <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesByDobYear()">Ngày Sinh <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('employeeType')">Chức Vụ <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('department')">Phòng Ban <i class="fa fa-sort"></i></li>
-      <li (click)="sortEmployeesBy('workStatus')">Trạng Thái <i class="fa fa-sort"></i></li>
+      <li data-attribute="id" (click)="sortEmployeesByIdDesc()">Mã NV <i class="fa fa-sort"></i></li>
+      <li data-attribute="name" (click)="sortEmployeesBy('name')">Họ Và Tên <i class="fa fa-sort"></i></li>
+      <li data-attribute="gender" (click)="sortEmployeesBy('gender')">Giới Tính <i class="fa fa-sort"></i></li>
+      <li data-attribute="phone" (click)="sortEmployeesBy('phone')">Số Điện Thoại <i class="fa fa-sort"></i></li>
+      <li data-attribute="hometown" (click)="sortEmployeesBy('hometown')">Quê Quán <i class="fa fa-sort"></i></li>
+      <li data-attribute="dob" (click)="sortEmployeesByDobYear()">Ngày Sinh <i class="fa fa-sort"></i></li>
+      <li data-attribute="employeeType" (click)="sortEmployeesBy('employeeType')">Chức Vụ <i class="fa fa-sort"></i></li>
+      <li data-attribute="department" (click)="sortEmployeesBy('department')">Phòng Ban <i class="fa fa-sort"></i></li>
+      <li data-attribute="workStatus" (click)="sortEmployeesBy('workStatus')">Trạng Thái <i class="fa fa-sort"></i></li>
       <li>Hành Động</li>
     </ul>
     
@@ -158,11 +161,10 @@
     </ul>
   </div>
 
-  <div class="pagination">
-    <button (click)="goToFirstPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><<</button>
-    <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><</button>
-    <span>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} / {{ totalItems }}</span>
-    <button (click)="goToNextPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">></button>
-    <button (click)="goToLastPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">>></button>
-  </div>
+  <app-pagination
+    [currentPage]="currentPage"
+    [itemsPerPage]="itemsPerPage"
+    [totalItems]="totalItems"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
 </div>

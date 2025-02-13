@@ -155,11 +155,10 @@
   </div>
 
   <!-- Phân trang -->
-  <div class="pagination">
-    <button (click)="goToFirstPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><<</button>
-    <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><</button>
-    <span>{{ (currentPage - 1) * itemsPerPage + 1 }} - {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} / {{ totalItems }}</span>
-    <button (click)="goToNextPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">></button>
-    <button (click)="goToLastPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">>></button>
-  </div>
+  <app-pagination
+    [currentPage]="currentPage"
+    [itemsPerPage]="itemsPerPage"
+    [totalItems]="totalItems"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
 </div>

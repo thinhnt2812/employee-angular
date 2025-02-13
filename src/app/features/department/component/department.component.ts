@@ -4,10 +4,12 @@ import { Department } from '../department.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
+
 
 @Component({
   selector: 'app-department',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css']
 })
@@ -171,27 +173,9 @@ export class DepartmentComponent implements OnInit {
     this.setNextDepartmentId();
   }
 
-  goToFirstPage() {
-    this.currentPage = 1;
-    this.loadDepartments();
-  }
-
-  goToPreviousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadDepartments();
-    }
-  }
-
-  goToNextPage() {
-    if (this.currentPage * this.itemsPerPage < this.totalItems) {
-      this.currentPage++;
-      this.loadDepartments();
-    }
-  }
-
-  goToLastPage() {
-    this.currentPage = Math.ceil(this.totalItems / this.itemsPerPage);
+  // Hàm này xử lý thay đổi trang
+  onPageChange(page: number): void {
+    this.currentPage = page;
     this.loadDepartments();
   }
 }

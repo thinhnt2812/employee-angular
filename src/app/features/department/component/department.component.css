@@ -227,35 +227,3 @@
     border-radius: 16px;
     color: white;
 }
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.pagination button {
-    background-color: #2D336B;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 2px 12px;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.pagination button:hover {
-    background-color: #575C89;
-}
-
-.pagination button.disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.pagination span {
-    margin: 0 10px;
-    font-size: 14px;
-}

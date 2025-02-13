@@ -5,10 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeService } from '../employee.service';
 import { Employee } from '../employee.model';
+import { EmployeeConstants } from '../../../constants/employeeConstants'; // Import EmployeeConstants
+import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
 
 @Component({
   selector: 'app-employee-management',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent], // Add PaginationComponent
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
@@ -27,6 +29,8 @@ export class EmployeeManagementComponent implements OnInit {
   totalItems: number = 0;
   employeeIdToDelete: number | null = null;
   validationErrorMessage: string = '';
+  searchConfirmed: boolean = false;
+  filterConfirmed: boolean = false;
 
   sortOrder: { [key: string]: boolean } = {};
 
@@ -45,26 +49,9 @@ export class EmployeeManagementComponent implements OnInit {
     'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Dương'
   ];
 
-  gender: { id: number, name: string }[] = [
-    { id: 1, name: 'Nam' },
-    { id: 2, name: 'Nữ' },
-    { id: 3, name: 'Khác' }
-  ];
-
-  employeeType: { id: number, name: string }[] = [
-    { id: 1, name: 'Giám đốc' },
-    { id: 2, name: 'Trưởng phòng' },
-    { id: 3, name: 'Kế toán' },
-    { id: 4, name: 'Trưởng nhóm' },
-    { id: 5, name: 'Nhân viên' },
-    { id: 6, name: 'Kỹ sư phần mềm' },
-    { id: 7, name: 'Kiểm thử phần mềm' }
-  ];
-
-  workStatus: { id: number, name: string }[] = [
-    { id: 1, name: 'Đang làm' },
-    { id: 2, name: 'Đã nghỉ' }
-  ];
+  gender = EmployeeConstants.getGenders(); // Use EmployeeConstants
+  employeeType = EmployeeConstants.getEmployeeTypes(); // Use EmployeeConstants
+  workStatus = EmployeeConstants.getWorkStatuses(); // Use EmployeeConstants
 
   departments: { id: number, name: string }[] = [];
 
@@ -78,31 +65,32 @@ export class EmployeeManagementComponent implements OnInit {
     private modalService: NgbModal
   ) {}
 
+  // Hàm này được gọi khi component được khởi tạo
   ngOnInit(): void {
-    // Hàm này được gọi khi component được khởi tạo
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
+      this.itemsPerPage = +params['icpp'] || 10;
       this.fetchEmployees();
     });
-    this.fetchDepartments(); // Lấy danh sách phòng ban khi khởi tạo
+    this.fetchDepartments();
   }
 
+  // Hàm này lấy danh sách phòng ban từ service
   private fetchDepartments(): void {
-    // Hàm này lấy danh sách phòng ban từ service
     this.employeeService.getDepartments().then(data => {
       this.departments = data
-        .filter(dept => dept.workStatus.id === 1) // Chỉ lấy những phòng ban đang hoạt động
+        .filter(dept => dept.workStatus.id === 1)
         .map(dept => ({ id: dept.id, name: dept.name }));
     });
   }
 
+  // Hàm này dùng để theo dõi các phần tử trong danh sách bằng id
   trackById(index: number, item: Employee): number {
-    // Hàm này dùng để theo dõi các phần tử trong danh sách bằng id
     return Number(item.id);
   }
 
+  // Hàm này lấy danh sách nhân viên từ service
   private fetchEmployees(): void {
-    // Hàm này lấy danh sách nhân viên từ service
     this.employeeService.getEmployees().then(data => {
       this.originalEmployeeList = [...data];
       this.totalItems = data.length;
@@ -110,36 +98,59 @@ export class EmployeeManagementComponent implements OnInit {
     });
   }
 
+  // Hàm này cập nhật danh sách nhân viên hiển thị theo trang hiện tại và từ khóa tìm kiếm
   private updateEmployeeList(): void {
-    // Hàm này cập nhật danh sách nhân viên hiển thị theo trang hiện tại và từ khóa tìm kiếm
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     const filteredList = this.searchKeyword.trim() ? this.filterEmployees() : this.originalEmployeeList;
     const departmentFilteredList = this.filterDepartment ? filteredList.filter(emp => emp.department === this.filterDepartment) : filteredList;
     const workStatusFilteredList = this.filterWorkStatus ? departmentFilteredList.filter(emp => emp.workStatus === this.filterWorkStatus) : departmentFilteredList;
-    this.employeeList = workStatusFilteredList.slice(startIndex, endIndex);
-    this.totalItems = workStatusFilteredList.length;
+
+    const sortedList = this.applySorting(workStatusFilteredList);
+
+    this.employeeList = sortedList.slice(startIndex, endIndex);
+    this.totalItems = sortedList.length;
     this.updateUrl();
   }
 
+  // Hàm này áp dụng sắp xếp cho danh sách nhân viên
+  private applySorting(employeeList: Employee[]): Employee[] {
+    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    const order = direction === 'asc' ? 1 : -1;
+
+    return employeeList.sort((a, b) => {
+      const valueA = a[attribute] ?? '';
+      const valueB = b[attribute] ?? '';
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return order * (valueA - valueB);
+      } else if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return order * valueA.localeCompare(valueB);
+      } else {
+        return 0;
+      }
+    });
+  }
+
+  // Hàm này lọc danh sách nhân viên theo từ khóa tìm kiếm
   private filterEmployees(): Employee[] {
-    // Hàm này lọc danh sách nhân viên theo từ khóa tìm kiếm
     const keyword = this.searchKeyword.toLowerCase();
     return this.originalEmployeeList.filter(employee =>
       employee.name.toLowerCase().includes(keyword)
     );
   }
 
+  // Hàm này cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
   private updateUrl(): void {
-    // Hàm này cập nhật URL với tham số trang hiện tại
     this.router.navigate([], {
-      queryParams: { page: this.currentPage },
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage },
       queryParamsHandling: 'merge'
     });
   }
 
+  // Hàm này xử lý thêm mới hoặc cập nhật thông tin nhân viên
   onAddOrUpdate(): void {
-    // Hàm này xử lý thêm mới hoặc cập nhật thông tin nhân viên
     if (Object.values(this.currentEmployee).some(value => value === '')) {
       this.validationErrorMessage = 'Vui lòng điền đầy đủ thông tin!';
       this.modalService.open(this.validationErrorModal).result.then(
@@ -167,7 +178,6 @@ export class EmployeeManagementComponent implements OnInit {
       return;
     }
 
-    // Thêm ngày giờ hiện tại ở Việt Nam vào đối tượng nhân viên
     this.currentEmployee.createdAt = this.getVietnamTime();
 
     this.currentEmployee.gender = Number(this.currentEmployee.gender);
@@ -191,28 +201,28 @@ export class EmployeeManagementComponent implements OnInit {
     }
   }
 
+  // Hàm này trả về thời gian hiện tại ở Việt Nam
   private getVietnamTime(): string {
-    // Hàm này trả về thời gian hiện tại ở Việt Nam
     const now = new Date();
-    now.setHours(now.getHours() + 7); // Điều chỉnh múi giờ UTC+7
+    now.setHours(now.getHours() + 7);
     return now.toISOString().replace('T', ' ').substring(0, 19);
   }
 
+  // Hàm này xử lý khi người dùng muốn chỉnh sửa thông tin nhân viên
   onEdit(employee: Employee): void {
-    // Hàm này xử lý khi người dùng muốn chỉnh sửa thông tin nhân viên
     this.editMode = true;
     this.currentEmployee = { ...employee };
     this.openModal();
   }
 
+  // Hàm này xử lý khi người dùng muốn xóa nhân viên
   onDelete(id: number): void {
-    // Hàm này xử lý khi người dùng muốn xóa nhân viên
     this.employeeIdToDelete = id;
     this.modalService.open(this.confirmDeleteModal);
   }
 
+  // Hàm này xác nhận xóa nhân viên
   confirmDelete(): void {
-    // Hàm này xác nhận xóa nhân viên
     if (this.employeeIdToDelete !== null) {
       this.employeeService.deleteEmployee(this.employeeIdToDelete).then(() => {
         this.fetchEmployees();
@@ -221,38 +231,47 @@ export class EmployeeManagementComponent implements OnInit {
     }
   }
 
+  // Hàm này xử lý tìm kiếm nhân viên
   onSearch(): void {
-    // Hàm này xử lý tìm kiếm nhân viên
-    if (this.searchKeyword.trim().length >= 3 || this.searchKeyword.trim().length === 0) {
+    if (this.searchKeyword.trim().length === 0) {
+      this.searchConfirmed = false;
       this.currentPage = 1;
       this.updateEmployeeList();
       this.updateUrl();
     }
   }
 
+  // Hàm này xác nhận tìm kiếm nhân viên
+  confirmSearch(): void {
+    this.searchConfirmed = true;
+    this.currentPage = 1;
+    this.updateEmployeeList();
+    this.updateUrl();
+  }
+
+  // Hàm này kiểm tra ngày sinh hợp lệ
   private validateDob(dob: string): boolean {
-    // Hàm này kiểm tra ngày sinh hợp lệ
     return new Date(dob) <= new Date();
   }
 
+  // Hàm này kiểm tra số điện thoại hợp lệ
   private validatePhone(phone: string): boolean {
-    // Hàm này kiểm tra số điện thoại hợp lệ
     return /^\d{10}$/.test(phone);
   }
 
+  // Hàm này đặt lại form về trạng thái mặc định
   private resetForm(): void {
-    // Hàm này đặt lại form về trạng thái mặc định
     this.currentEmployee = this.getDefaultEmployee();
     this.editMode = false;
   }
 
+  // Hàm này trả về đối tượng nhân viên mặc định
   private getDefaultEmployee(): Employee {
-    // Hàm này trả về đối tượng nhân viên mặc định
     return { id: 0, name: '', gender: 0, hometown: '', dob: '', phone: '', employeeType: 0, workStatus: 1, department: 0 };
   }
 
+  // Hàm này sắp xếp nhân viên theo thuộc tính
   sortEmployeesBy(attribute: keyof Employee): void {
-    // Hàm này sắp xếp danh sách nhân viên theo thuộc tính
     this.sortOrder[attribute] = !this.sortOrder[attribute];
     const order = this.sortOrder[attribute] ? 1 : -1;
     this.employeeList.sort((a, b) => {
@@ -260,84 +279,80 @@ export class EmployeeManagementComponent implements OnInit {
       const valueB = b[attribute] ?? '';
       return order * String(valueA).localeCompare(String(valueB));
     });
+    this.updateSortIcons(attribute);
+    this.updateUrlWithSortParams(attribute, this.sortOrder[attribute] ? 'asc' : 'desc');
   }
 
+  // Hàm này sắp xếp nhân viên theo id giảm dần
   sortEmployeesByIdDesc(): void {
-    // Hàm này sắp xếp danh sách nhân viên theo id giảm dần
     this.sortOrder['id'] = !this.sortOrder['id'];
     const order = this.sortOrder['id'] ? 1 : -1;
     this.employeeList.sort((a, b) => order * ((Number(b.id) || 0) - (Number(a.id) || 0)));
+    this.updateSortIcons('id');
+    this.updateUrlWithSortParams('id', this.sortOrder['id'] ? 'asc' : 'desc');
   }
 
+  // Hàm này cập nhật biểu tượng sắp xếp
+  private updateSortIcons(attribute: keyof Employee): void {
+    const elements = document.querySelectorAll('.employee_info li i');
+    elements.forEach(el => el.classList.remove('fa-arrow-up', 'fa-arrow-down'));
+    const icon = document.querySelector(`.employee_info li[data-attribute="${attribute}"] i`);
+    if (icon) {
+      icon.classList.add(this.sortOrder[attribute] ? 'fa-arrow-up' : 'fa-arrow-down');
+    }
+  }
+
+  // Hàm này sắp xếp nhân viên theo năm sinh
   sortEmployeesByDobYear(): void {
-    // Hàm này sắp xếp danh sách nhân viên theo năm sinh giảm dần
     this.sortOrder['dob'] = !this.sortOrder['dob'];
     const order = this.sortOrder['dob'] ? 1 : -1;
     this.employeeList.sort((a, b) => {
-      const yearA = new Date(a.dob).getFullYear() || 0;
-      const yearB = new Date(b.dob).getFullYear() || 0;
-      return order * (yearB - yearA);
+      const dateA = new Date(a.dob).getTime();
+      const dateB = new Date(b.dob).getTime();
+      return order * (dateB - dateA);
+    });
+    this.updateSortIcons('dob');
+    this.updateUrlWithSortParams('dob', this.sortOrder['dob'] ? 'asc' : 'desc');
+  }
+
+  // Hàm này cập nhật URL với tham số sắp xếp
+  private updateUrlWithSortParams(attribute: keyof Employee, direction: string): void {
+    this.router.navigate([], {
+      queryParams: { Direction: attribute, Sort: direction },
+      queryParamsHandling: 'merge'
     });
   }
 
-  goToFirstPage(): void {
-    // Hàm này chuyển đến trang đầu tiên
-    this.currentPage = 1;
+  // Hàm này xử lý thay đổi trang
+  onPageChange(page: number): void {
+    this.currentPage = page;
     this.updateEmployeeList();
     this.updateUrl();
   }
 
-  goToPreviousPage(): void {
-    // Hàm này chuyển đến trang trước đó
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updateEmployeeList();
-      this.updateUrl();
-    }
-  }
-
-  goToNextPage(): void {
-    // Hàm này chuyển đến trang tiếp theo
-    if (this.currentPage * this.itemsPerPage < this.totalItems) {
-      this.currentPage++;
-      this.updateEmployeeList();
-      this.updateUrl();
-    }
-  }
-
-  goToLastPage(): void {
-    // Hàm này chuyển đến trang cuối cùng
-    this.currentPage = Math.ceil(this.totalItems / this.itemsPerPage);
-    this.updateEmployeeList();
-    this.updateUrl();
-  }
-
+  // Hàm này trả về nhãn giới tính
   getGenderLabel(gender: number): string {
-    // Hàm này trả về nhãn giới tính
-    const gend = this.gender.find(d => d.id === gender);
-    return gend ? gend.name : '';
+    return EmployeeConstants.getGenderName(gender); // Use EmployeeConstants
   }
 
+  // Hàm này trả về nhãn loại nhân viên
   getEmployeeTypeLabel(employeeType: number): string {
-    // Hàm này trả về nhãn loại nhân viên
-    const eplT = this.employeeType.find(d => d.id === employeeType);
-    return eplT ? eplT.name : '';
+    return EmployeeConstants.getEmployeeTypeName(employeeType); // Use EmployeeConstants
   }
 
+  // Hàm này trả về nhãn trạng thái làm việc
   getWorkStatusLabel(workStatus: number): string {
-    // Hàm này trả về nhãn trạng thái làm việc
-    const work = this.workStatus.find(d => d.id === workStatus);
-    return work ? work.name : '';
+    return EmployeeConstants.getWorkStatusName(workStatus); // Use EmployeeConstants
   }
 
+  // Hàm này trả về nhãn phòng ban
   getDepartmentLabel(department: number): string {
-    // Hàm này trả về nhãn phòng ban
     const dept = this.departments.find(d => d.id === department);
     return dept ? dept.name : '';
   }
 
+  // Hàm này mở modal thêm mới hoặc chỉnh sửa nhân viên
   openModal(employee?: Employee): void {
-    // Hàm này mở modal thêm mới hoặc chỉnh sửa nhân viên
     if (employee) {
       this.currentEmployee = { ...employee };
       this.editMode = true;
@@ -349,19 +364,26 @@ export class EmployeeManagementComponent implements OnInit {
     this.modalService.open(this.employeeModal);
   }
 
+  // Hàm này gán id mới cho nhân viên
   private assignNewId(): void {
-    // Hàm này gán id mới cho nhân viên
     const maxId = this.originalEmployeeList.length > 0 ? Math.max(...this.originalEmployeeList.map(e => Number(e.id))) : 0;
     this.currentEmployee.id = maxId + 1;
   }
 
+  // Hàm này mở modal xác nhận xóa nhân viên
   openConfirmDeleteModal(id: number): void {
-    // Hàm này mở modal xác nhận xóa nhân viên
     this.employeeIdToDelete = id;
     this.modalService.open(this.confirmDeleteModal);
   }
 
+  // Hàm này xử lý khi thay đổi bộ lọc
   onFilterChange(): void {
+    this.filterConfirmed = false;
+  }
+
+  // Hàm này xác nhận bộ lọc
+  confirmFilter(): void {
+    this.filterConfirmed = true;
     this.currentPage = 1;
     this.updateEmployeeList();
     this.updateUrl();

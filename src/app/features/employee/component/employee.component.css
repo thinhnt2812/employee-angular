@@ -1,25 +1,27 @@
 .employee {
     display: flex;
-    margin-top: 60px;
+    margin-top: 56px;
     margin-left: 12%;
     flex-direction: column;
     align-items: center;
 }
 
 .employee_title{
-    padding: 16px 0;
+    padding: 20px 0;
 }
 
 .employee_title h1{
     font-weight: bold;
+    margin-bottom: 0;
 }
 
 .employee_search{
-    margin-bottom: 100px;
+    display: flex;
+    gap: 20px;
 }
 
 .search_inp{
-    width: 240px;
+    width: 210px;
     padding: 8px; 
     border: 0.1px solid #ccc; 
     border-radius: 5px;
@@ -39,28 +41,33 @@
     font-style: italic;
 }
 
-.employee_add_btn{
+.employee_btns{
     background-color: #8b0000;
     color: #fff;
     opacity: 0.8;
-    padding: 10px;
+    padding: 8px 10px;
     border: none;
     border-radius: 5px;
-    width: 160px;
-    height: 44px;
 }
 
-.employee_add_btn:hover {
+.employee_btns:hover {
     opacity: 0.9;
 }
 
-.employee_filters {
-    position: absolute;
-    right: 10%;
-    top: 210px;
+.filter_emp {
     display: flex;
+    justify-content: space-between;
     gap: 20px;
     align-items: flex-end;
+}
+
+.employee_filters {
+    align-items: flex-end;
+    margin-bottom: 20px;
+    display: flex;
+    width: 85%;
+    justify-content: space-between;
+
 }
 
 .employee_filters select {
@@ -204,38 +211,6 @@
 
 .employee_btn:first-child{
     margin-bottom: 6px;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.pagination button {
-    background-color: #8b0000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 2px 12px;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.pagination button:hover {
-    background-color: #a52a2a;
-}
-
-.pagination button.disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.pagination span {
-    margin: 0 10px;
-    font-size: 14px;
 }
 
 .form-group {
