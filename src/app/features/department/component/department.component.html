@@ -3,17 +3,31 @@
     <h1>Danh sách phòng ban</h1>
   </div>
 
-  <div class="employee_search">
-    <input 
-      class="search_inp" 
-      type="text" 
-      placeholder="Tìm kiếm phòng ban theo tên..." 
-      [(ngModel)]="searchTerm"
-      (input)="onSearchTermChange()"
-    />
+  <div class="department_operation">
+    <div class="department_search">
+      <input 
+        class="search_inp" 
+        type="text" 
+        placeholder="Tìm kiếm phòng ban theo tên..." 
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchTermChange()"
+      />
+      <button class="department_btns" (click)="confirmSearchTerm()">Xác nhận</button>
+      
+    </div>
+    <div class="department_filter">
+      <div class="department_filter_status">
+        <p>Lọc theo trạng thái:</p>
+        <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="form-control">
+          <option [ngValue]="null">Tất cả trạng thái</option>
+          <option *ngFor="let status of workStatuses" [ngValue]="status.id">{{ status.name }}</option>
+        </select>
+      </div>
+      <button class="department_btns" (click)="confirmStatusChange()">Xác nhận</button>
+    </div>
+    <button class="department_btns" (click)="openModal(content)">Thêm phòng ban</button>
   </div>
 
-  <button class="department_add_btn" (click)="openModal(content)">Thêm phòng ban</button>
     
   <ng-template #content let-modal>
     <div class="modal-header">
@@ -63,10 +77,10 @@
     
   <div class="department_table">
     <ul class="department_info">
-      <li (click)="setSortField('id')">Mã phòng ban <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('name')">Tên phòng ban <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('description')">Mô tả <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('workStatus.name')">Trạng thái <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li (click)="setSortField('id')">Mã phòng ban <i class="fa-solid" [ngClass]="getSortIcon('id')"></i></li>
+      <li (click)="setSortField('name')">Tên phòng ban <i class="fa-solid" [ngClass]="getSortIcon('name')"></i></li>
+      <li (click)="setSortField('description')">Mô tả <i class="fa-solid" [ngClass]="getSortIcon('description')"></i></li>
+      <li (click)="setSortField('workStatus.name')">Trạng thái <i class="fa-solid" [ngClass]="getSortIcon('workStatus.name')"></i></li>
       <li>Hành Động</li>
     </ul>
     <ul class="department_lists" *ngFor="let dept of departments">

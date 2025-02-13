@@ -73,6 +73,8 @@ export class EmployeeManagementComponent implements OnInit {
       this.fetchEmployees();
     });
     this.fetchDepartments();
+    this.updateSortIconsFromParams();
+    this.setDefaultSortParams(); // Add this line
   }
 
   // Hàm này lấy danh sách phòng ban từ service
@@ -94,7 +96,28 @@ export class EmployeeManagementComponent implements OnInit {
     this.employeeService.getEmployees().then(data => {
       this.originalEmployeeList = [...data];
       this.totalItems = data.length;
+      this.applyInitialSorting();
       this.updateEmployeeList();
+    });
+  }
+
+  // Hàm này áp dụng sắp xếp ban đầu dựa trên tham số truy vấn
+  private applyInitialSorting(): void {
+    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    this.sortOrder[attribute] = direction === 'asc';
+    this.originalEmployeeList.sort((a, b) => {
+      const valueA = a[attribute] ?? '';
+      const valueB = b[attribute] ?? '';
+      const order = this.sortOrder[attribute] ? 1 : -1;
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return order * (valueA - valueB);
+      } else if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return order * valueA.localeCompare(valueB);
+      } else {
+        return 0;
+      }
     });
   }
 
@@ -144,7 +167,7 @@ export class EmployeeManagementComponent implements OnInit {
   // Hàm này cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
   private updateUrl(): void {
     this.router.navigate([], {
-      queryParams: { page: this.currentPage, icpp: this.itemsPerPage },
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, Direction: this.route.snapshot.queryParamMap.get('Direction'), Sort: this.route.snapshot.queryParamMap.get('Sort') },
       queryParamsHandling: 'merge'
     });
   }
@@ -318,7 +341,7 @@ export class EmployeeManagementComponent implements OnInit {
   // Hàm này cập nhật URL với tham số sắp xếp
   private updateUrlWithSortParams(attribute: keyof Employee, direction: string): void {
     this.router.navigate([], {
-      queryParams: { Direction: attribute, Sort: direction },
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, Direction: attribute, Sort: direction },
       queryParamsHandling: 'merge'
     });
   }
@@ -387,5 +410,21 @@ export class EmployeeManagementComponent implements OnInit {
     this.currentPage = 1;
     this.updateEmployeeList();
     this.updateUrl();
+  }
+
+  // Hàm này cập nhật biểu tượng sắp xếp từ tham số truy vấn
+  private updateSortIconsFromParams(): void {
+    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    this.sortOrder[attribute] = direction === 'asc';
+    this.updateSortIcons(attribute);
+  }
+
+  // Add this method to set default sorting parameters
+  private setDefaultSortParams(): void {
+    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    this.sortOrder[attribute] = direction === 'asc';
+    this.updateUrlWithSortParams(attribute, direction);
   }
 }

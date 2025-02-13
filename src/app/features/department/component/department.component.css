@@ -2,25 +2,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 60px;
+    margin-top: 56px;
     margin-left: 12%;
     font-family: Arial, sans-serif;
 }
 
 .department_title{
-    padding: 16px 0;
+    padding: 20px 0;
 }
 
 .department_title h1{
     font-weight: bold;
-}
-
-.employee_search{
-    margin-bottom: 50px;
+    margin-bottom: 0;
 }
 
 .search_inp{
     width: 220px;
+    height: 40px;
     padding: 8px; 
     border: 0.1px solid #ccc; 
     border-radius: 5px;
@@ -38,22 +36,6 @@
 .search_inp::placeholder{
     color: #aaa;
     font-style: italic;
-}
-
-.department_add_btn{
-    background-color: #2D336B;
-    color: #fff;
-    opacity: 0.8;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    position: absolute;
-    right: 10%;
-    top: 176px;
-}
-
-.department_add_btn:hover {
-    opacity: 0.9;
 }
 
 .department_table {
@@ -226,4 +208,58 @@
     background-color: #AF1740;
     border-radius: 16px;
     color: white;
+}
+
+.status_filter {
+    height: 40px;
+    padding: 8px;
+    border: 0.1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.department_btns{
+    height: 40px;
+    padding: 0 10px;
+    border: none;
+    background-color: #2D336B;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.department_btns:hover{
+    background-color: #2330a0;
+}
+
+.department_operation{
+    display: flex;
+    justify-content: space-between;
+    width: 85%;
+    margin-bottom: 20px;
+    align-items: flex-end;
+}
+
+.department_filter,
+.department_search{
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.department_filter_status p{
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2D336B;
+}
+
+.department_filter_status .form-control{
+    width: 180px;
+    font-weight: 500;
+    font-style: italic;
+    height: 40px;
 }

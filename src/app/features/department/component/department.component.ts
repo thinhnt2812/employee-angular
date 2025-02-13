@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
+import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
 
 
 @Component({
@@ -32,24 +33,38 @@ export class DepartmentComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
+  selectedStatus: number | null = null;
 
-  constructor(private departmentService: DepartmentService, private modalService: NgbModal) {}
+  constructor(private departmentService: DepartmentService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.loadDepartments(); // Tải danh sách phòng ban khi khởi tạo
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +params['page'] || 1;
+      this.itemsPerPage = +params['icpp'] || 10;
+      const sortDirection = params['sort'] || 'asc';
+      const sortAttribute = params['direction'] || 'id';
+      this.sortField = sortAttribute;
+      this.sortDirection = sortDirection;
+      this.loadDepartments();
+    });
     this.setNextDepartmentId(); // Đặt ID cho phòng ban mới
   }
 
   // Tải danh sách phòng ban từ service và lọc theo từ khóa tìm kiếm
   async loadDepartments() {
     const allDepartments = await this.departmentService.getDepartments();
-    this.totalItems = allDepartments.length;
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = this.currentPage * this.itemsPerPage;
+    const filteredDepartments = this.selectedStatus !== null
+      ? allDepartments.filter(dept => dept.workStatus.id === this.selectedStatus)
+      : allDepartments;
+    this.totalItems = filteredDepartments.length;
     this.departments = this.searchTerm.trim()
-      ? allDepartments.filter(dept => dept.name.toLowerCase().includes(this.searchTerm.toLowerCase())).slice(startIndex, endIndex)
-      : allDepartments.slice(startIndex, endIndex);
+      ? filteredDepartments.filter(dept => dept.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      : filteredDepartments;
     this.sortDepartments();
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.departments = this.departments.slice(startIndex, endIndex);
+    this.updateUrl();
   }
 
   // Sắp xếp danh sách phòng ban theo trường và hướng sắp xếp
@@ -76,9 +91,9 @@ export class DepartmentComponent implements OnInit {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortField = field;
-      this.sortDirection = field === 'id' ? 'desc' : 'asc'; 
+      this.sortDirection = 'asc'; 
     }
-    this.sortDepartments();
+    this.loadDepartments();
   }
 
   // Xác định ID tiếp theo cho phòng ban mới nếu không ở chế độ chỉnh sửa
@@ -156,8 +171,25 @@ export class DepartmentComponent implements OnInit {
     }
   }
 
-  // Xử lý tìm kiếm khi giá trị từ khóa thay đổi
+  // Xác nhận tìm kiếm
+  confirmSearchTerm() {
+    this.loadDepartments();
+  }
+
+  // Xử lý thay đổi giá trị tìm kiếm
   onSearchTermChange() {
+    if (!this.searchTerm.trim()) {
+      this.loadDepartments();
+    }
+  }
+
+  // Xử lý thay đổi trạng thái làm việc
+  onStatusChange() {
+    // No need to set any flag
+  }
+
+  // Xác nhận thay đổi trạng thái làm việc
+  confirmStatusChange() {
     this.loadDepartments();
   }
 
@@ -173,9 +205,24 @@ export class DepartmentComponent implements OnInit {
     this.setNextDepartmentId();
   }
 
+  // Hàm này cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
+  private updateUrl(): void {
+    this.router.navigate([], {
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: this.sortField, sort: this.sortDirection },
+      queryParamsHandling: 'merge'
+    });
+  }
+
   // Hàm này xử lý thay đổi trang
   onPageChange(page: number): void {
     this.currentPage = page;
     this.loadDepartments();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField === field) {
+      return this.sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down';
+    }
+    return 'fa-arrows-up-down';
   }
 }
