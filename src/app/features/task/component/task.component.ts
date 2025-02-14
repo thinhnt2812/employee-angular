@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
 import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
+import { TaskStatusConstants } from '../../../constants/taskConstants'; // Import TaskStatusConstants
 
 @Component({
   selector: 'app-task',
@@ -21,14 +22,7 @@ export class TaskComponent implements OnInit {
   employees: Employee[] = []; // Danh sách các nhân viên
   
   // Danh sách trạng thái của nhiệm vụ
-  statuses = [
-    { id: 1, name: 'Mới' },
-    { id: 2, name: 'Đang làm' },
-    { id: 3, name: 'Đã làm xong' },
-    { id: 4, name: 'Đã kiểm tra' },
-    { id: 5, name: 'Phản hồi' },
-    { id: 6, name: 'Đóng' }
-  ];
+  statuses = TaskStatusConstants.getStatuses(); // Use TaskStatusConstants to get statuses
 
   newTask: Task = this.getEmptyTask(); // Biến lưu trữ nhiệm vụ mới hoặc đang chỉnh sửa
   isEditing = false; // Cờ kiểm tra trạng thái chỉnh sửa
@@ -184,7 +178,8 @@ export class TaskComponent implements OnInit {
 
   // Cập nhật trạng thái của nhiệm vụ
   setStatus(statusId: number) {
-    this.newTask.status = this.statuses.find(status => status.id === statusId) || this.statuses[0];
+    const status = this.statuses.find(status => status.value === statusId) || this.statuses[0];
+    this.newTask.status = { id: status.value, name: status.label };
   }
 
   // Mở modal để thêm hoặc chỉnh sửa nhiệm vụ
@@ -243,7 +238,7 @@ export class TaskComponent implements OnInit {
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
   private getEmptyTask(): Task {
-    return { id: 0, name: '', description: '', priority: 1, department: 0, dueDate: '', assignee: '', status: this.statuses[0] };
+    return { id: 0, name: '', description: '', priority: 1, department: 0, dueDate: '', assignee: '', status: { id: this.statuses[0].value, name: this.statuses[0].label } };
   }
 
   // Đặt lại biểu mẫu sau khi thêm hoặc cập nhật nhiệm vụ

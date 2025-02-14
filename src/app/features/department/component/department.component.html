@@ -20,7 +20,7 @@
         <p>Lọc theo trạng thái:</p>
         <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="form-control">
           <option [ngValue]="null">Tất cả trạng thái</option>
-          <option *ngFor="let status of workStatuses" [ngValue]="status.id">{{ status.name }}</option>
+          <option *ngFor="let status of workStatuses" [ngValue]="status.value">{{ status.label }}</option>
         </select>
       </div>
       <button class="department_btns" (click)="confirmStatusChange()">Lọc</button>
@@ -50,7 +50,7 @@
       <div class="form-group">
         <label>Trạng Thái</label>
         <select class="form-control" [(ngModel)]="newDepartment.workStatus">
-          <option *ngFor="let status of workStatuses" [ngValue]="status">{{ status.name }}</option>
+          <option *ngFor="let status of workStatuses" [ngValue]="status">{{ status.label }}</option>
         </select>
       </div>
       <div *ngIf="validationMessage" class="alert alert-danger">{{ validationMessage }}</div>

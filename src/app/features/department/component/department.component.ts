@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
 import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
+import { DepartmentConstants } from '../../../constants/departmentConstants'; // Import DepartmentConstants
 
 
 @Component({
@@ -18,10 +19,7 @@ export class DepartmentComponent implements OnInit {
   departments: Department[] = []; // Danh sách các phòng ban
   
   // Danh sách trạng thái làm việc của phòng ban
-  workStatuses = [
-    { id: 1, name: 'Đang hoạt động' },
-    { id: 2, name: 'Đã dừng' }
-  ];
+  workStatuses = DepartmentConstants.getStatuses();
 
   newDepartment: Department = this.getEmptyDepartment(); // Biến lưu trữ phòng ban mới hoặc đang chỉnh sửa
   isEditing = false; // Cờ kiểm tra trạng thái chỉnh sửa
@@ -140,7 +138,8 @@ export class DepartmentComponent implements OnInit {
 
   // Cập nhật trạng thái làm việc của phòng ban
   setWorkStatus(statusId: number) {
-    this.newDepartment.workStatus = this.workStatuses.find(status => status.id === statusId) || this.workStatuses[0];
+    const status = this.workStatuses.find(status => status.value === statusId) || this.workStatuses[0];
+    this.newDepartment.workStatus = { id: status.value, name: status.label };
   }
 
   // Mở modal để thêm hoặc chỉnh sửa phòng ban
@@ -195,7 +194,7 @@ export class DepartmentComponent implements OnInit {
 
   // Khởi tạo một đối tượng phòng ban rỗng
   private getEmptyDepartment(): Department {
-    return { id: 0, name: '', description: '', workStatus: this.workStatuses[0] };
+    return { id: 0, name: '', description: '', workStatus: { id: this.workStatuses[0].value, name: this.workStatuses[0].label } };
   }
 
   // Đặt lại biểu mẫu sau khi thêm hoặc cập nhật phòng ban

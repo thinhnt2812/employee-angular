@@ -14,7 +14,7 @@
         <p>Lọc theo trạng thái:</p>
         <select class="filter_select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
           <option [ngValue]="null">Tất cả trạng thái</option>
-          <option *ngFor="let status of statuses" [ngValue]="status.id">{{ status.name }}</option>
+          <option *ngFor="let status of statuses" [ngValue]="status.value">{{ status.label }}</option>
         </select>
       </div>
       <div class="filter_department">
@@ -88,7 +88,7 @@
       <div class="form-group">
         <label>Trạng Thái</label>
         <select class="form-control" [(ngModel)]="newTask.status">
-          <option *ngFor="let status of statuses" [ngValue]="status">{{ status.name }}</option>
+          <option *ngFor="let status of statuses" [ngValue]="status">{{ status.label }}</option>
         </select>
       </div>
       <div *ngIf="validationMessage" class="alert alert-danger">{{ validationMessage }}</div>
