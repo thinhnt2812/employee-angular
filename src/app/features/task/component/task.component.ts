@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
+import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
 
 @Component({
   selector: 'app-task',
@@ -32,6 +33,7 @@ export class TaskComponent implements OnInit {
   newTask: Task = this.getEmptyTask(); // Biến lưu trữ nhiệm vụ mới hoặc đang chỉnh sửa
   isEditing = false; // Cờ kiểm tra trạng thái chỉnh sửa
   searchTerm = ''; // Biến lưu trữ giá trị tìm kiếm
+  searchConfirmed = false; // Biến lưu trữ trạng thái xác nhận tìm kiếm
   validationMessage: string = '';
   taskToDelete: number | null = null;
   sortField: string = '';
@@ -42,18 +44,31 @@ export class TaskComponent implements OnInit {
   selectedDepartment: string = '';
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
+  filterConfirmed = false; // Biến lưu trữ trạng thái xác nhận lọc
 
-  constructor(private taskService: TaskService, private modalService: NgbModal) {}
+  constructor(private taskService: TaskService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit() {
+    this.searchConfirmed = true; // Mặc định xác nhận tìm kiếm
+    this.filterConfirmed = true; // Mặc định xác nhận lọc
     this.loadTasks(); // Tải danh sách nhiệm vụ khi khởi tạo
     this.loadDepartments(); // Tải danh sách phòng ban khi khởi tạo
     this.loadEmployees(); // Tải danh sách nhân viên khi khởi tạo
     this.setNextTaskId(); // Đặt ID cho nhiệm vụ mới
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +params['page'] || 1;
+      this.itemsPerPage = +params['icpp'] || 10;
+      const sortDirection = params['sort'] || 'asc';
+      const sortAttribute = params['direction'] || 'id';
+      this.sortField = sortAttribute;
+      this.sortDirection = sortDirection;
+      this.loadTasks();
+    });
   }
 
   // Tải danh sách nhiệm vụ từ service và lọc theo từ khóa tìm kiếm
   async loadTasks() {
+    if (!this.searchConfirmed && !this.filterConfirmed) return;
     const allTasks = await this.taskService.getTasks();
     this.totalItems = allTasks.length;
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -67,6 +82,7 @@ export class TaskComponent implements OnInit {
       )
       .slice(startIndex, endIndex);
     this.sortTasks();
+    this.updateUrl();
   }
 
   // Tải danh sách phòng ban từ service và lọc các phòng ban đang hoạt động
@@ -119,6 +135,7 @@ export class TaskComponent implements OnInit {
       this.sortDirection = field === 'id' ? 'desc' : 'asc'; 
     }
     this.sortTasks();
+    this.updateUrl();
   }
 
   // Xác định ID tiếp theo cho nhiệm vụ mới nếu không ở chế độ chỉnh sửa
@@ -200,11 +217,27 @@ export class TaskComponent implements OnInit {
 
   // Xử lý tìm kiếm khi giá trị từ khóa thay đổi
   onSearchTermChange() {
+    this.searchConfirmed = false;
+    if (!this.searchTerm.trim()) {
+      this.searchConfirmed = true;
+      this.loadTasks();
+    }
+  }
+
+  // Xác nhận tìm kiếm
+  confirmSearch() {
+    this.searchConfirmed = true;
     this.loadTasks();
   }
 
   // Xử lý thay đổi bộ lọc
   onFilterChange() {
+    this.filterConfirmed = false;
+  }
+
+  // Xác nhận lọc
+  confirmFilter() {
+    this.filterConfirmed = true;
     this.loadTasks();
   }
 
@@ -232,5 +265,19 @@ export class TaskComponent implements OnInit {
     const currentDate = new Date();
     const taskDueDate = new Date(dueDate);
     return taskDueDate < currentDate;
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField === field) {
+      return this.sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up';
+    }
+    return 'fa-arrows-up-down';
+  }
+
+  private updateUrl(): void {
+    this.router.navigate([], {
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: this.sortField, sort: this.sortDirection },
+      queryParamsHandling: 'merge'
+    });
   }
 }

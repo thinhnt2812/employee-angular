@@ -26,14 +26,14 @@ export class DepartmentComponent implements OnInit {
   newDepartment: Department = this.getEmptyDepartment(); // Biến lưu trữ phòng ban mới hoặc đang chỉnh sửa
   isEditing = false; // Cờ kiểm tra trạng thái chỉnh sửa
   searchTerm = ''; // Biến lưu trữ giá trị tìm kiếm
-  validationMessage: string = '';
-  departmentToDelete: number | null = null;
-  sortField: string = '';
-  sortDirection: 'asc' | 'desc' = 'asc';
-  currentPage = 1;
-  itemsPerPage = 10;
-  totalItems = 0;
-  selectedStatus: number | null = null;
+  validationMessage: string = ''; // Thông báo xác thực
+  departmentToDelete: number | null = null; // ID phòng ban cần xóa
+  sortField: string = ''; // Trường sắp xếp
+  sortDirection: 'asc' | 'desc' = 'asc'; // Hướng sắp xếp
+  currentPage = 1; // Trang hiện tại
+  itemsPerPage = 10; // Số mục trên mỗi trang
+  totalItems = 0; // Tổng số mục
+  selectedStatus: number | null = null; // Trạng thái làm việc được chọn
 
   constructor(private departmentService: DepartmentService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
@@ -185,7 +185,7 @@ export class DepartmentComponent implements OnInit {
 
   // Xử lý thay đổi trạng thái làm việc
   onStatusChange() {
-    // No need to set any flag
+    // Không cần đặt cờ
   }
 
   // Xác nhận thay đổi trạng thái làm việc
@@ -219,6 +219,7 @@ export class DepartmentComponent implements OnInit {
     this.loadDepartments();
   }
 
+  // Lấy biểu tượng sắp xếp
   getSortIcon(field: string): string {
     if (this.sortField === field) {
       return this.sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down';

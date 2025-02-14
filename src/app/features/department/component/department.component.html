@@ -12,7 +12,7 @@
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchTermChange()"
       />
-      <button class="department_btns" (click)="confirmSearchTerm()">Xác nhận</button>
+      <button class="department_btns" (click)="confirmSearchTerm()">Tìm kiếm</button>
       
     </div>
     <div class="department_filter">
@@ -23,7 +23,7 @@
           <option *ngFor="let status of workStatuses" [ngValue]="status.id">{{ status.name }}</option>
         </select>
       </div>
-      <button class="department_btns" (click)="confirmStatusChange()">Xác nhận</button>
+      <button class="department_btns" (click)="confirmStatusChange()">Lọc</button>
     </div>
     <button class="department_btns" (click)="openModal(content)">Thêm phòng ban</button>
   </div>

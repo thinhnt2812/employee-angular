@@ -4,40 +4,45 @@
     <h1>Danh sách nhiệm vụ</h1>
   </div>
 
-  <!-- Tìm kiếm -->
-  <div class="task_search">
-    <input 
-      class="search_inp" 
-      type="text" 
-      placeholder="Tìm kiếm nhiệm vụ theo tên..." 
-      [(ngModel)]="searchTerm"
-      (input)="onSearchTermChange()"
-    />
-  </div>
-
   <!-- Bộ lọc -->
   <div class="task_filters">
     <button class="task_add_btn" (click)="openModal(content)">Thêm nhiệm vụ</button>
-    <div class="filter_status">
-      <p>Lọc theo trạng thái:</p>
-      <select class="filter_select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
-        <option [ngValue]="null">Tất cả trạng thái</option>
-        <option *ngFor="let status of statuses" [ngValue]="status.id">{{ status.name }}</option>
-      </select>
+
+    <div class="task_filterss">
+      <button class="filter_btn" (click)="confirmFilter()">Lọc</button>
+      <div class="filter_status">
+        <p>Lọc theo trạng thái:</p>
+        <select class="filter_select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="null">Tất cả trạng thái</option>
+          <option *ngFor="let status of statuses" [ngValue]="status.id">{{ status.name }}</option>
+        </select>
+      </div>
+      <div class="filter_department">
+        <p>Lọc theo phòng ban:</p>
+        <select class="filter_select" [(ngModel)]="selectedDepartment" (change)="onFilterChange()">
+          <option value="">Tất cả phòng ban</option>
+          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+        </select>
+      </div>
+      <div class="filter_priority">
+        <p>Lọc theo độ ưu tiên:</p>
+        <select class="filter_select" [(ngModel)]="selectedPriority" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="null">Tất cả độ ưu tiên</option>
+          <option *ngFor="let priority of [1, 2, 3, 4, 5]" [ngValue]="priority">{{ priority }}</option>
+        </select>
+      </div>
     </div>
-    <div class="filter_department">
-      <p>Lọc theo phòng ban:</p>
-      <select class="filter_select" [(ngModel)]="selectedDepartment" (change)="onFilterChange()">
-        <option value="">Tất cả phòng ban</option>
-        <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
-      </select>
-    </div>
-    <div class="filter_priority">
-      <p>Lọc theo độ ưu tiên:</p>
-      <select class="filter_select" [(ngModel)]="selectedPriority" (ngModelChange)="onFilterChange()">
-        <option [ngValue]="null">Tất cả độ ưu tiên</option>
-        <option *ngFor="let priority of [1, 2, 3, 4, 5]" [ngValue]="priority">{{ priority }}</option>
-      </select>
+    
+    <!-- Tìm kiếm -->
+    <div class="task_search">
+      <input 
+        class="search_inp" 
+        type="text" 
+        placeholder="Tìm kiếm nhiệm vụ theo tên..." 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchTermChange()"
+      />
+      <button class="search_btn" (click)="confirmSearch()">Tìm kiếm</button>
     </div>
   </div>
 
@@ -112,14 +117,14 @@
   <!-- Danh sách nhiệm vụ -->
   <div class="task_table">
     <ul class="task_info">
-      <li (click)="setSortField('id')">Mã nhiệm vụ <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('name')">Tên nhiệm vụ <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('description')">Mô tả <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('priority')">Độ ưu tiên <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('department')">Phòng ban <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('assignee')">Người xử lý <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('dueDate')">Ngày hết hạn <i class="fa-solid fa-arrows-up-down"></i></li>
-      <li (click)="setSortField('status.name')">Trạng thái <i class="fa-solid fa-arrows-up-down"></i></li>
+      <li (click)="setSortField('id')">Mã nhiệm vụ <i class="fa-solid" [ngClass]="getSortIcon('id')"></i></li>
+      <li (click)="setSortField('name')">Tên nhiệm vụ <i class="fa-solid" [ngClass]="getSortIcon('name')"></i></li>
+      <li (click)="setSortField('description')">Mô tả <i class="fa-solid" [ngClass]="getSortIcon('description')"></i></li>
+      <li (click)="setSortField('priority')">Độ ưu tiên <i class="fa-solid" [ngClass]="getSortIcon('priority')"></i></li>
+      <li (click)="setSortField('department')">Phòng ban <i class="fa-solid" [ngClass]="getSortIcon('department')"></i></li>
+      <li (click)="setSortField('assignee')">Người xử lý <i class="fa-solid" [ngClass]="getSortIcon('assignee')"></i></li>
+      <li (click)="setSortField('dueDate')">Ngày hết hạn <i class="fa-solid" [ngClass]="getSortIcon('dueDate')"></i></li>
+      <li (click)="setSortField('status.name')">Trạng thái <i class="fa-solid" [ngClass]="getSortIcon('status.name')"></i></li>
       <li>Hành Động</li>
     </ul>
     <ul class="task_lists" *ngFor="let task of tasks" [ngClass]="{'past-due': isPastDueDate(task.dueDate)}">
