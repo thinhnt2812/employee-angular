@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService } from '../task.service';
-import { Task } from '../task.model';
+import { Task, TaskStatusConstants } from '../task.model';
 import { Department } from '../../department/department.model';
-import { Employee } from '../../employee/employee.model';
+import { Employee, } from '../../employee/employee.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
-import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
-import { TaskStatusConstants } from '../../../constants/taskConstants'; // Import TaskStatusConstants
+import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { Router, ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-task',
@@ -22,7 +21,7 @@ export class TaskComponent implements OnInit {
   employees: Employee[] = []; // Danh sách các nhân viên
   
   // Danh sách trạng thái của nhiệm vụ
-  statuses = TaskStatusConstants.getStatuses(); // Use TaskStatusConstants to get statuses
+  statuses = TaskStatusConstants.getStatuses(); // Sử dụng TaskStatusConstants để lấy trạng thái
 
   newTask: Task = this.getEmptyTask(); // Biến lưu trữ nhiệm vụ mới hoặc đang chỉnh sửa
   isEditing = false; // Cờ kiểm tra trạng thái chỉnh sửa
@@ -157,7 +156,7 @@ export class TaskComponent implements OnInit {
     }
     this.resetForm();
     modal.close();
-    this.loadEmployees(); // Load lại danh sách nhân viên sau khi thêm hoặc cập nhật nhiệm vụ
+    this.loadEmployees(); // Tải lại danh sách nhân viên sau khi thêm hoặc cập nhật nhiệm vụ
   }
 
   // Xóa nhiệm vụ dựa trên ID
@@ -172,7 +171,7 @@ export class TaskComponent implements OnInit {
     this.newTask = { ...task };
     this.isEditing = true;
     this.setStatus(task.status.id);
-    this.loadEmployeesByDepartment(task.department); // Load nhân viên theo phòng ban khi chỉnh sửa nhiệm vụ
+    this.loadEmployeesByDepartment(task.department); // Tải nhân viên theo phòng ban khi chỉnh sửa nhiệm vụ
     this.openModal(content);
   }
 
@@ -246,7 +245,7 @@ export class TaskComponent implements OnInit {
     this.isEditing = false;
     this.newTask = this.getEmptyTask();
     this.setNextTaskId();
-    this.loadEmployees(); // Load lại danh sách nhân viên khi đặt lại biểu mẫu
+    this.loadEmployees(); // Tải lại danh sách nhân viên khi đặt lại biểu mẫu
   }
 
   // Hàm này xử lý thay đổi trang
@@ -262,6 +261,7 @@ export class TaskComponent implements OnInit {
     return taskDueDate < currentDate;
   }
 
+  // Lấy biểu tượng sắp xếp
   getSortIcon(field: string): string {
     if (this.sortField === field) {
       return this.sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up';
@@ -269,6 +269,7 @@ export class TaskComponent implements OnInit {
     return 'fa-arrows-up-down';
   }
 
+  // Cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
   private updateUrl(): void {
     this.router.navigate([], {
       queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: this.sortField, sort: this.sortDirection },

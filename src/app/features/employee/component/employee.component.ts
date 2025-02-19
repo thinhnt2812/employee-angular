@@ -4,13 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeService } from '../employee.service';
-import { Employee } from '../employee.model';
-import { EmployeeConstants } from '../../../constants/employeeConstants'; // Import EmployeeConstants
-import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
+import { Employee, EmployeeConstants } from '../employee.model';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
 
 @Component({
   selector: 'app-employee-management',
-  imports: [CommonModule, FormsModule, PaginationComponent], // Add PaginationComponent
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
@@ -49,9 +48,9 @@ export class EmployeeManagementComponent implements OnInit {
     'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Bình Dương'
   ];
 
-  gender = EmployeeConstants.getGenders(); // Use EmployeeConstants
-  employeeType = EmployeeConstants.getEmployeeTypes(); // Use EmployeeConstants
-  workStatus = EmployeeConstants.getWorkStatuses(); // Use EmployeeConstants
+  gender = EmployeeConstants.getGenders(); // Sử dụng EmployeeConstants
+  employeeType = EmployeeConstants.getEmployeeTypes(); // Sử dụng EmployeeConstants
+  workStatus = EmployeeConstants.getWorkStatuses(); // Sử dụng EmployeeConstants
 
   departments: { id: number, name: string }[] = [];
 
@@ -74,7 +73,7 @@ export class EmployeeManagementComponent implements OnInit {
     });
     this.fetchDepartments();
     this.updateSortIconsFromParams();
-    this.setDefaultSortParams(); // Add this line
+    this.setDefaultSortParams(); // Thêm dòng này
   }
 
   // Hàm này lấy danh sách phòng ban từ service
@@ -355,17 +354,17 @@ export class EmployeeManagementComponent implements OnInit {
 
   // Hàm này trả về nhãn giới tính
   getGenderLabel(gender: number): string {
-    return EmployeeConstants.getGenderName(gender); // Use EmployeeConstants
+    return EmployeeConstants.getGenderName(gender); // Sử dụng EmployeeConstants
   }
 
   // Hàm này trả về nhãn loại nhân viên
   getEmployeeTypeLabel(employeeType: number): string {
-    return EmployeeConstants.getEmployeeTypeName(employeeType); // Use EmployeeConstants
+    return EmployeeConstants.getEmployeeTypeName(employeeType); // Sử dụng EmployeeConstants
   }
 
   // Hàm này trả về nhãn trạng thái làm việc
   getWorkStatusLabel(workStatus: number): string {
-    return EmployeeConstants.getWorkStatusName(workStatus); // Use EmployeeConstants
+    return EmployeeConstants.getWorkStatusName(workStatus); // Sử dụng EmployeeConstants
   }
 
   // Hàm này trả về nhãn phòng ban
@@ -420,7 +419,7 @@ export class EmployeeManagementComponent implements OnInit {
     this.updateSortIcons(attribute);
   }
 
-  // Add this method to set default sorting parameters
+  // Thêm phương thức này để đặt tham số sắp xếp mặc định
   private setDefaultSortParams(): void {
     const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
     const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';

@@ -17,7 +17,6 @@
 }
 
 .task_search{
-    display: flex;
     align-items: flex-end;
     gap: 20px;
 }
@@ -72,21 +71,21 @@
     opacity: 0.9;
 }
 
-.task_filterss{
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: flex-end;
-    gap: 20px;
-}
-
 .task_filters {
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
     width: 85%;
-    flex-direction: row-reverse;
+    /* flex-direction: row-reverse; */
     align-items: flex-end;
     justify-content: space-between;
+}
+
+.task_filterss{
+    display: flex;
+    /* flex-direction: row-reverse; */
+    align-items: flex-end;
+    gap: 20px;
 }
 
 .task_filters p {
@@ -141,6 +140,7 @@
     padding: 12px 6px;
     border-radius: 12px;
     font-size: 16px;
+    gap: 20px;
 }
 
 .task_info li {
@@ -171,6 +171,7 @@
     background-color: rgba(25, 207, 25, 0.05);
     border-radius: 8px;
     transition: background-color 0.3s ease;
+    gap: 20px;
 }
 
 .task_lists:hover {
@@ -191,9 +192,18 @@
     width: 20%;
 }
 
+.task_list:nth-child(2),
+.task_list:nth-child(3),
+.task_list:nth-child(5),
+.task_list:nth-child(6){
+    justify-content: flex-start;
+    text-align: left;
+}
+
 .task_list:first-child {
     font-weight: bold;
     color: #5B913B;
+    justify-content: flex-end;
 }
 
 .task_list .btn {
@@ -208,6 +218,10 @@
     text-align: center;
     background-color: transparent;
     inset: -13px auto auto 4px !important;
+}
+
+.task_list p{
+    margin-bottom: 0;
 }
 
 .task_btn {
@@ -267,46 +281,52 @@
     box-shadow: none;
 }
 
-.status-new {
+.status-new p{
     background-color: #2D336B;
     border-radius: 16px;
+    padding: 2px 10px;
     font-weight: bold;
     color: white;
 }
 
-.status-in-progress {
+.status-in-progress p{
     background-color: #B2A5FF;
     border-radius: 16px;
+    padding: 2px 10px;
     color: #3F4F44;
     font-weight: bold;
 }
 
-.status-completed {
+.status-completed p{
     background-color: #FBA518;
     border-radius: 16px;
+    padding: 2px 10px;
     font-weight: bold;
     color: white;
 }
 
-.status-checked {
+.status-checked p{
     background-color: #A0C878;
     border-radius: 16px;
+    padding: 2px 10px;
     font-weight: bold;
     color: #3F4F44;
 }
 
-.status-feedback {
+.status-feedback p{
     background-color: #2C3930;
     border-radius: 16px;
     font-weight: bold;
     color: white;
+    padding: 2px 10px;
 }
 
-.status-closed {
+.status-closed p{
     background-color: #A9BFA8;
     border-radius: 16px;
     font-weight: bold;
     color: #3F4F44;
+    padding: 2px 10px;
 }
 
 .past-due {

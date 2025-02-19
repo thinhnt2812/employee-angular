@@ -4,16 +4,7 @@
   </div>
   
   <div class="employee_filters">
-    <div class="employee_search">
-      <input 
-        class="search_inp" 
-        type="text" 
-        [(ngModel)]="searchKeyword" 
-        (ngModelChange)="onSearch()" 
-        placeholder="Tìm kiếm nhân viên theo tên..." 
-      />
-      <button class="employee_btns" (click)="confirmSearch()">Tìm kiếm</button>
-    </div>
+    <button class="employee_btns" (click)="openModal()">Thêm Nhân Viên</button>
     <div class="filter_emp">
       <div class="filter_department">
         <p>Lọc theo phòng ban:</p>
@@ -29,9 +20,18 @@
           <option *ngFor="let status of workStatus" [ngValue]="status.value">{{ status.label }}</option>
         </select>
       </div>
+      <div class="employee_search">
+        <p>Nhập tên nhân viên cần tìm kiếm:</p>
+        <input 
+          class="search_inp" 
+          type="text" 
+          [(ngModel)]="searchKeyword" 
+          (ngModelChange)="onSearch()" 
+          placeholder="Tìm kiếm nhân viên theo tên..." 
+        />
+      </div>
       <button class="employee_btns" (click)="confirmFilter()">Lọc</button>
     </div>
-    <button class="employee_btns" (click)="openModal()">Thêm Nhân Viên</button>
   </div>
 
 
@@ -145,7 +145,7 @@
       <li class="employee_list">{{ getEmployeeTypeLabel(employee.employeeType) }}</li>
       <li class="employee_list">{{ getDepartmentLabel(employee.department) }}</li>
       <li class="employee_list" [ngClass]="{'status-working': employee.workStatus === 1, 'status-left': employee.workStatus === 2}">
-        {{ getWorkStatusLabel(employee.workStatus) }}
+        <p>{{ getWorkStatusLabel(employee.workStatus) }}</p>
       </li>
       <li class="employee_list">
         <div class="dropend">

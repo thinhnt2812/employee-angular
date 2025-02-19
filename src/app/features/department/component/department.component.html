@@ -4,17 +4,7 @@
   </div>
 
   <div class="department_operation">
-    <div class="department_search">
-      <input 
-        class="search_inp" 
-        type="text" 
-        placeholder="Tìm kiếm phòng ban theo tên..." 
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchTermChange()"
-      />
-      <button class="department_btns" (click)="confirmSearchTerm()">Tìm kiếm</button>
-      
-    </div>
+    <button class="department_btns" (click)="openModal(content)">Thêm phòng ban</button>
     <div class="department_filter">
       <div class="department_filter_status">
         <p>Lọc theo trạng thái:</p>
@@ -23,9 +13,18 @@
           <option *ngFor="let status of workStatuses" [ngValue]="status.value">{{ status.label }}</option>
         </select>
       </div>
+      <div class="department_search">
+        <p>Tìm kiếm phòng ban theo tên:</p>
+        <input 
+          class="search_inp" 
+          type="text" 
+          placeholder="Tìm kiếm phòng ban theo tên..." 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchTermChange()"
+        />
+      </div>
       <button class="department_btns" (click)="confirmStatusChange()">Lọc</button>
     </div>
-    <button class="department_btns" (click)="openModal(content)">Thêm phòng ban</button>
   </div>
 
     
@@ -88,7 +87,9 @@
       <li class="department_list">{{ dept.name }}</li>
       <li class="department_list">{{ dept.description }}</li>
       <li class="department_list" [ngClass]="{'status-active': dept.workStatus.id === 1, 'status-inactive': dept.workStatus.id === 2}">
-        {{ dept.workStatus.name }}
+        <p>
+          {{ dept.workStatus.name }}
+        </p>
       </li>
       <li class="department_list">
         <div class="dropend">

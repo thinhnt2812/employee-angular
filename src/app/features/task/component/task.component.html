@@ -9,7 +9,6 @@
     <button class="task_add_btn" (click)="openModal(content)">Thêm nhiệm vụ</button>
 
     <div class="task_filterss">
-      <button class="filter_btn" (click)="confirmFilter()">Lọc</button>
       <div class="filter_status">
         <p>Lọc theo trạng thái:</p>
         <select class="filter_select" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
@@ -31,18 +30,17 @@
           <option *ngFor="let priority of [1, 2, 3, 4, 5]" [ngValue]="priority">{{ priority }}</option>
         </select>
       </div>
-    </div>
-    
-    <!-- Tìm kiếm -->
-    <div class="task_search">
-      <input 
-        class="search_inp" 
-        type="text" 
-        placeholder="Tìm kiếm nhiệm vụ theo tên..." 
-        [(ngModel)]="searchTerm"
-        (input)="onSearchTermChange()"
-      />
-      <button class="search_btn" (click)="confirmSearch()">Tìm kiếm</button>
+      <div class="task_search">
+        <p>TÌm kiếm nhiệm vụ theo tên:</p>
+        <input 
+          class="search_inp" 
+          type="text" 
+          placeholder="Tìm kiếm nhiệm vụ theo tên..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchTermChange()"
+        />
+      </div>
+      <button class="filter_btn" (click)="confirmFilter()">Lọc</button>
     </div>
   </div>
 
@@ -143,7 +141,10 @@
         'status-feedback': task.status.id === 5, 
         'status-closed': task.status.id === 6
       }">
-        {{ task.status.name }}
+        <p>
+          {{ task.status.name }}
+
+        </p>
       </li>
       <li class="task_list">
         <div class="dropend">

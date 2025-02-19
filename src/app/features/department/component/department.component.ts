@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { DepartmentService } from '../department.service';
-import { Department } from '../department.model';
+import { Department, DepartmentConstants } from '../department.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PaginationComponent } from '../../../shared/pagination/pagination.component'; // Import PaginationComponent
-import { Router, ActivatedRoute } from '@angular/router'; // Import Router and ActivatedRoute
-import { DepartmentConstants } from '../../../constants/departmentConstants'; // Import DepartmentConstants
-
+import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
+import { Router, ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-department',
