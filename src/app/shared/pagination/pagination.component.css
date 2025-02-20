@@ -6,7 +6,7 @@
 }
 
 .pagination button {
-    background-color: #8b0000;
+    background-color: #3C2A21;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -17,7 +17,7 @@
 }
 
 .pagination button:hover {
-    background-color: #a52a2a;
+    background-color: #775442;
 }
 
 .pagination button.disabled {

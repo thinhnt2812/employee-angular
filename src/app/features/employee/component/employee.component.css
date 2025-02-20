@@ -27,8 +27,8 @@
 }
 
 .search_inp:focus{
-    border-color: #ff5733;
-    box-shadow: 0 0 5px rgba(255, 87, 51, 0.5);
+    border-color: rgb(80, 75, 56);
+    box-shadow: 0 0 5px rgba(80, 75, 56, 0.5);
 }
 
 .search_inp::placeholder{
@@ -37,7 +37,7 @@
 }
 
 .employee_btns{
-    background-color: #8b0000;
+    background-color: #504B38;
     color: #fff;
     opacity: 0.8;
     padding: 8px 10px;
@@ -71,8 +71,8 @@
 }
 
 .employee_filters select:focus {
-    border-color: #ff5733;
-    box-shadow: 0 0 5px rgba(255, 87, 51, 0.5);
+    border-color: #504B38;
+    box-shadow: 0 0 5px rgba(80, 75, 56, 0.5);
 }
 
 .filter_department,
@@ -86,7 +86,7 @@
     margin-bottom: 0;
     font-size: 14px;
     font-weight: bold;
-    color: #8B0000;
+    color: #504B38;
 }
 
 .employee_table {
@@ -123,7 +123,7 @@
 .employee_info {
     display: flex;
     text-align: center;
-    background-color: #8b0000;
+    background-color: #504B38;
     color: #fff;
     font-weight: bold;
     padding: 12px 6px;
@@ -153,14 +153,14 @@
     text-align: center;
     padding: 6px;
     margin: 8px 0;
-    background-color: rgba(139, 0, 0, 0.05);
+    background-color: rgba(80, 75, 56, 0.05);
     border-radius: 8px;
     transition: background-color 0.3s ease;
     gap: 20px;
 }
 
 .employee_lists:hover {
-    background-color: rgba(139, 0, 0, 0.15);
+    background-color: rgba(80, 75, 56, 0.15);
 }
 
 .employee_list {
@@ -171,11 +171,12 @@
     font-size: 14px;
     color: #333;
     list-style: none;
+    text-align: left;
 }
 
 .employee_list:first-child {
     font-weight: bold;
-    color: #8b0000;
+    color: #504B38;
     justify-content: flex-end;
 }
 
@@ -183,8 +184,8 @@
 .employee_list:nth-child(6),
 .employee_list:nth-child(9),
 .employee_list:nth-child(10){
-    justify-content: flex-start;
-    text-align: left;
+    justify-content: center;
+    text-align: center;
 }
 
 .employee_list .btn{
@@ -213,7 +214,7 @@
 }
 
 .employee_btn:hover {
-    background-color: #8B0000;
+    background-color: #504B38;
 }
 
 .employee_btn:first-child{
@@ -229,17 +230,17 @@
 }
 
 .form-control:focus {
-    border-color: #4da6ff;
-    box-shadow: 0 0 5px rgba(77, 166, 255, 0.5); 
+    border-color: rgb(80, 75, 56);
+    box-shadow: 0 0 5px rgba(80, 75, 56, 0.5); 
 }
 
 .modal-footer-cancel{
     color: #fff;
-    background-color: #8b0000;
+    background-color: #504B38;
 }
 
 .modal-footer-cancel:hover{
-    background-color: #a52a2a;
+    background-color: #777056;
 }
 
 .modal-footer-cancel:focus{
@@ -271,7 +272,7 @@
 }
 
 .status-left p{
-    background-color: red;
+    background-color: #BE3144;
     border-radius: 16px;
     color: white;
     margin-bottom: 0;
@@ -280,4 +281,21 @@
 
 .filter_emp .form-control{
     height: 40px;
+}
+.form_ctm,
+.form_ctm1,
+.form_ctm2{
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.form_ctm .form-group:nth-child(1){
+    width: 30%;
+}
+.form_ctm .form-group:nth-child(2){
+    width: 70%;
+}
+.form_ctm2 .form-group,
+.form_ctm1 .form-group{
+    width: 50%;
 }

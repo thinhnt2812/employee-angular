@@ -41,39 +41,39 @@
       <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body modal_body_ctm">
-      <div class="form-group">
-        <label>Mã Nhân Viên</label>
-        <input class="form-control" [(ngModel)]="currentEmployee.id" placeholder="Mã Nhân Viên" disabled />
+      <div class="form_ctm">
+        <div class="form-group">
+          <label>Mã Nhân Viên</label>
+          <input class="form-control" [(ngModel)]="currentEmployee.id" placeholder="Mã Nhân Viên" disabled />
+        </div>
+        <div class="form-group">
+          <label>Họ Và Tên</label>
+          <input class="form-control" [(ngModel)]="currentEmployee.name" required />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Họ Và Tên</label>
-        <input class="form-control" [(ngModel)]="currentEmployee.name" required />
+      <div class="form_ctm1">
+        <div class="form-group">
+          <label>Giới Tính</label>
+          <select class="form-control" [(ngModel)]="currentEmployee.gender" required>
+            <option *ngFor="let gender of gender" [value]="gender.value">{{ gender.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Số Điện Thoại</label>
+          <input class="form-control" [(ngModel)]="currentEmployee.phone" required />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Giới Tính</label>
-        <select class="form-control" [(ngModel)]="currentEmployee.gender" required>
-          <option *ngFor="let gender of gender" [value]="gender.value">{{ gender.label }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Số Điện Thoại</label>
-        <input class="form-control" [(ngModel)]="currentEmployee.phone" required />
-      </div>
-      <div class="form-group">
-        <label>Quê Quán</label>
-        <select class="form-control" [(ngModel)]="currentEmployee.hometown" required>
-          <option *ngFor="let city of hometowns" [value]="city">{{ city }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Ngày Sinh</label>
-        <input class="form-control" [(ngModel)]="currentEmployee.dob" placeholder="Ngày Sinh" type="date" required />
-      </div>
-      <div class="form-group">
-        <label>Chức Vụ</label>
-        <select class="form-control" [(ngModel)]="currentEmployee.employeeType" required>
-          <option *ngFor="let employeeType of employeeType" [value]="employeeType.value">{{ employeeType.label }}</option>
-        </select>
+      <div class="form_ctm2">
+        <div class="form-group">
+          <label>Quê Quán</label>
+          <select class="form-control" [(ngModel)]="currentEmployee.hometown" required>
+            <option *ngFor="let city of hometowns" [value]="city">{{ city }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ngày Sinh</label>
+          <input class="form-control" [(ngModel)]="currentEmployee.dob" placeholder="Ngày Sinh" type="date" required />
+        </div>
       </div>
       <div class="form-group">
         <label>Phòng Ban</label>
@@ -82,15 +82,24 @@
         </select>
       </div>
       <div class="form-group">
+        <label>Chức Vụ</label>
+        <select class="form-control" [(ngModel)]="currentEmployee.employeeType" required>
+          <option *ngFor="let employeeType of employeeType" [value]="employeeType.value">{{ employeeType.label }}</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Trạng Thái</label>
         <select class="form-control" [(ngModel)]="currentEmployee.workStatus" required>
           <option *ngFor="let workStatus of workStatus" [value]="workStatus.value">{{ workStatus.label }}</option>
         </select>
       </div>
+      <div *ngIf="validationErrorMessage" class="alert alert-danger">
+        {{ validationErrorMessage }}
+      </div>
     </div>
     <div class="modal-footer modal_footer_ctm">
       <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel click')">Hủy</button>
-      <button type="button" class="btn modal-footer-cancel" (click)="onAddOrUpdate(); modal.close('Save click')">Lưu</button>
+      <button type="button" class="btn modal-footer-cancel" (click)="onAddOrUpdate()">Lưu</button>
     </div>
   </ng-template>
 

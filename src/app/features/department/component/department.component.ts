@@ -101,7 +101,7 @@ export class DepartmentComponent implements OnInit {
 
   // Thêm hoặc cập nhật phòng ban, sau đó đóng modal
   async addOrUpdateDepartment(modal: any) {
-    if (!this.newDepartment.name.trim() || !this.newDepartment.description.trim()) {
+    if (!this.newDepartment.name.trim() || !this.newDepartment.description.trim() || !this.newDepartment.workStatus.name.trim()) {
       this.validationMessage = 'Vui lòng nhập đầy đủ thông tin.';
       return;
     }
@@ -168,11 +168,6 @@ export class DepartmentComponent implements OnInit {
     }
   }
 
-  // Xác nhận tìm kiếm
-  confirmSearchTerm() {
-    this.loadDepartments();
-  }
-
   // Xử lý thay đổi giá trị tìm kiếm
   onSearchTermChange() {
     if (!this.searchTerm.trim()) {
@@ -188,6 +183,7 @@ export class DepartmentComponent implements OnInit {
   // Xác nhận thay đổi trạng thái làm việc
   confirmStatusChange() {
     this.loadDepartments();
+    this.updateTotalItems();
   }
 
   // Khởi tạo một đối tượng phòng ban rỗng
@@ -222,5 +218,14 @@ export class DepartmentComponent implements OnInit {
       return this.sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down';
     }
     return 'fa-arrows-up-down';
+  }
+
+  private async updateTotalItems() {
+    const allDepartments = await this.departmentService.getDepartments();
+    this.totalItems = allDepartments
+      .filter((department: Department) => 
+        (!this.searchTerm.trim() || department.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
+        (!this.selectedStatus || department.workStatus.id === this.selectedStatus)
+      ).length;
   }
 }

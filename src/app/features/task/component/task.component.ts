@@ -140,8 +140,14 @@ export class TaskComponent implements OnInit {
 
   // Thêm hoặc cập nhật nhiệm vụ, sau đó đóng modal
   async addOrUpdateTask(modal: any) {
-    if (!this.newTask.name.trim() || !this.newTask.description.trim() || !this.newTask.department || !this.newTask.assignee.trim() || !this.newTask.dueDate.trim()) {
+    if (!this.newTask.name.trim() || !this.newTask.description.trim() || !this.newTask.department || !this.newTask.assignee.trim() || !this.newTask.dueDate.trim() || !this.newTask.status.name.trim()) {
       this.validationMessage = 'Vui lòng nhập đầy đủ thông tin.';
+      return;
+    }
+    const currentDate = new Date();
+    const dueDate = new Date(this.newTask.dueDate);
+    if (dueDate < currentDate) {
+      this.validationMessage = 'Ngày hết hạn không được là ngày trong quá khứ.';
       return;
     }
     this.validationMessage = '';
@@ -233,6 +239,7 @@ export class TaskComponent implements OnInit {
   confirmFilter() {
     this.filterConfirmed = true;
     this.loadTasks();
+    this.updateTotalItems();
   }
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
@@ -275,5 +282,16 @@ export class TaskComponent implements OnInit {
       queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: this.sortField, sort: this.sortDirection },
       queryParamsHandling: 'merge'
     });
+  }
+
+  private async updateTotalItems() {
+    const allTasks = await this.taskService.getTasks();
+    this.totalItems = allTasks
+      .filter(task => 
+        (!this.searchTerm.trim() || task.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
+        (!this.selectedDepartment || task.department === +this.selectedDepartment) &&
+        (!this.selectedStatus || task.status.id === this.selectedStatus) &&
+        (!this.selectedPriority || task.priority === this.selectedPriority)
+      ).length;
   }
 }
