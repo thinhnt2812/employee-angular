@@ -66,4 +66,10 @@ export class TaskService {
     const employees = await this.getEmployees();
     return employees.filter(emp => emp.department === departmentId);
   }
+
+  async getTaskById(taskId: number): Promise<Task | null> {
+    // Implementation to get a task by ID
+    const tasks = await this.getTasks();
+    return tasks.find(task => task.id === taskId) || null;
+  }
 }

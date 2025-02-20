@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { TaskService } from '../task.service';
 import { Task, TaskStatusConstants } from '../task.model';
 import { Department } from '../../department/department.model';
@@ -34,10 +34,14 @@ export class TaskComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
-  selectedDepartment: string = '';
+  selectedDepartment: number | null = null;
   selectedStatus: number | null = null;
   selectedPriority: number | null = null;
   filterConfirmed = false; // Biến lưu trữ trạng thái xác nhận lọc
+  notificationMessage: string = '';
+  notificationTimeout: any = null;
+
+  @ViewChild('content') modalContent: any;
 
   constructor(private taskService: TaskService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
@@ -55,6 +59,21 @@ export class TaskComponent implements OnInit {
       const sortAttribute = params['direction'] || 'id';
       this.sortField = sortAttribute;
       this.sortDirection = sortDirection;
+      this.selectedDepartment = params['department'] ? +params['department'] : null;
+      this.selectedStatus = params['status'] ? +params['status'] : null;
+      this.selectedPriority = params['priority'] ? +params['priority'] : null;
+      const taskId = params['taskId'] ? +params['taskId'] : null;
+      if (taskId) {
+        this.taskService.getTaskById(taskId).then(task => {
+          if (task) {
+            this.newTask = { ...task };
+            this.isEditing = true;
+            this.setStatus(task.status.id);
+            this.loadEmployeesByDepartment(task.department);
+            this.modalService.open(this.modalContent, { ariaLabelledBy: 'modal-basic-title' });
+          }
+        });
+      }
       this.loadTasks();
     });
   }
@@ -69,7 +88,7 @@ export class TaskComponent implements OnInit {
     this.tasks = allTasks
       .filter(task => 
         (!this.searchTerm.trim() || task.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
-        (!this.selectedDepartment || task.department === +this.selectedDepartment) &&
+        (!this.selectedDepartment || task.department === this.selectedDepartment) &&
         (!this.selectedStatus || task.status.id === this.selectedStatus) &&
         (!this.selectedPriority || task.priority === this.selectedPriority)
       )
@@ -156,13 +175,17 @@ export class TaskComponent implements OnInit {
       const index = this.tasks.findIndex(task => task.id === this.newTask.id);
       if (index !== -1) this.tasks[index] = { ...this.newTask };
       this.isEditing = false;
+      this.showNotification('Cập nhật thành công');
     } else {
       await this.taskService.addTask({ ...this.newTask });
       this.tasks.unshift({ ...this.newTask });
+      this.showNotification('Thêm thành công.');
     }
     this.resetForm();
     modal.close();
     this.loadEmployees(); // Tải lại danh sách nhân viên sau khi thêm hoặc cập nhật nhiệm vụ
+    this.modalService.dismissAll(); // Đóng tất cả các modal
+    this.removeTaskIdFromUrl(); // Remove task ID from URL
   }
 
   // Xóa nhiệm vụ dựa trên ID
@@ -170,6 +193,7 @@ export class TaskComponent implements OnInit {
     await this.taskService.deleteTask(id);
     this.loadTasks();
     this.setNextTaskId();
+    this.showNotification('Xóa thành công');
   }
 
   // Chỉnh sửa thông tin nhiệm vụ
@@ -178,6 +202,7 @@ export class TaskComponent implements OnInit {
     this.isEditing = true;
     this.setStatus(task.status.id);
     this.loadEmployeesByDepartment(task.department); // Tải nhân viên theo phòng ban khi chỉnh sửa nhiệm vụ
+    this.updateUrlWithTaskId(task.id); // Update URL with task ID
     this.openModal(content);
   }
 
@@ -196,6 +221,8 @@ export class TaskComponent implements OnInit {
   closeModal(modal: any) {
     modal.close();
     this.resetForm();
+    this.removeTaskIdFromUrl(); // Remove task ID from URL
+    this.modalService.dismissAll();
   }
 
   // Mở modal xác nhận xóa nhiệm vụ
@@ -212,6 +239,7 @@ export class TaskComponent implements OnInit {
       this.setNextTaskId();
       this.taskToDelete = null;
       modal.close();
+      this.showNotification('Xóa thành công');
     }
   }
 
@@ -240,6 +268,7 @@ export class TaskComponent implements OnInit {
     this.filterConfirmed = true;
     this.loadTasks();
     this.updateTotalItems();
+    this.updateUrlWithFilters(); // Update URL with filter parameters
   }
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
@@ -289,9 +318,55 @@ export class TaskComponent implements OnInit {
     this.totalItems = allTasks
       .filter(task => 
         (!this.searchTerm.trim() || task.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
-        (!this.selectedDepartment || task.department === +this.selectedDepartment) &&
+        (!this.selectedDepartment || task.department === this.selectedDepartment) &&
         (!this.selectedStatus || task.status.id === this.selectedStatus) &&
         (!this.selectedPriority || task.priority === this.selectedPriority)
       ).length;
+  }
+
+  private updateUrlWithTaskId(taskId: number): void {
+    this.router.navigate([], {
+      queryParams: { taskId: taskId },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  private removeTaskIdFromUrl(): void {
+    this.router.navigate([], {
+      queryParams: { taskId: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  private updateUrlWithFilters(): void {
+    const queryParams: any = {
+      page: this.currentPage,
+      icpp: this.itemsPerPage,
+      direction: this.sortField,
+      sort: this.sortDirection
+    };
+    if (this.selectedDepartment !== null) queryParams.department = this.selectedDepartment;
+    else queryParams.department = null;
+    
+    if (this.selectedStatus !== null) queryParams.status = this.selectedStatus;
+    else queryParams.status = null;
+    
+    if (this.selectedPriority !== null) queryParams.priority = this.selectedPriority;
+    else queryParams.priority = null;
+
+    this.router.navigate([], {
+      queryParams: queryParams,
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  showNotification(message: string) {
+    this.notificationMessage = message;
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    this.notificationTimeout = setTimeout(() => {
+      this.notificationMessage = '';
+    }, 5000);
   }
 }

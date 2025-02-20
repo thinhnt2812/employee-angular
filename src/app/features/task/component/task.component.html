@@ -18,8 +18,8 @@
       </div>
       <div class="filter_department">
         <p>Lọc theo phòng ban:</p>
-        <select class="filter_select" [(ngModel)]="selectedDepartment" (change)="onFilterChange()">
-          <option value="">Tất cả phòng ban</option>
+        <select class="filter_select" [(ngModel)]="selectedDepartment" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="null">Tất cả phòng ban</option>
           <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
         </select>
       </div>
@@ -42,6 +42,11 @@
       </div>
       <button class="filter_btn" (click)="confirmFilter()">Lọc</button>
     </div>
+  </div>
+
+  <!-- Notification -->
+  <div *ngIf="notificationMessage" class="noti_ctm">
+    {{ notificationMessage }}
   </div>
 
   <!-- Modal thêm hoặc cập nhật nhiệm vụ -->
