@@ -14,7 +14,7 @@ export const DepartmentConstants = {
     getStatusName: (id: number): string => Statuses[id] ?? '',
   
     // Hàm lấy danh sách trạng thái làm việc
-    getStatuses: () => Object.entries(Statuses).map(([k, v]) => ({ label: v, value: parseInt(k) })),
+    getStatuses: () => Object.entries(Statuses).map(([k, v]) => ({ name: v, id: parseInt(k) })),
   };
   
   const Statuses: Record<number, string> = {

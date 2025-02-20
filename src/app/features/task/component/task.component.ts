@@ -177,8 +177,8 @@ export class TaskComponent implements OnInit {
 
   // Cập nhật trạng thái của nhiệm vụ
   setStatus(statusId: number) {
-    const status = this.statuses.find(status => status.value === statusId) || this.statuses[0];
-    this.newTask.status = { id: status.value, name: status.label };
+    const status = this.statuses.find(status => status.id === statusId) || this.statuses[0];
+    this.newTask.status = { id: status.id, name: status.name };
   }
 
   // Mở modal để thêm hoặc chỉnh sửa nhiệm vụ
@@ -237,7 +237,7 @@ export class TaskComponent implements OnInit {
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
   private getEmptyTask(): Task {
-    return { id: 0, name: '', description: '', priority: 1, department: 0, dueDate: '', assignee: '', status: { id: this.statuses[0].value, name: this.statuses[0].label } };
+    return { id: 0, name: '', description: '', priority: 1, department: 0, dueDate: '', assignee: '', status: { id: 0, name: '' } };
   }
 
   // Đặt lại biểu mẫu sau khi thêm hoặc cập nhật nhiệm vụ

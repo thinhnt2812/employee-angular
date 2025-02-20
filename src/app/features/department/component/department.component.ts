@@ -136,8 +136,8 @@ export class DepartmentComponent implements OnInit {
 
   // Cập nhật trạng thái làm việc của phòng ban
   setWorkStatus(statusId: number) {
-    const status = this.workStatuses.find(status => status.value === statusId) || this.workStatuses[0];
-    this.newDepartment.workStatus = { id: status.value, name: status.label };
+    const status = this.workStatuses.find(status => status.id === statusId) || this.workStatuses[0];
+    this.newDepartment.workStatus = { id: status.id, name: status.name };
   }
 
   // Mở modal để thêm hoặc chỉnh sửa phòng ban
@@ -192,7 +192,7 @@ export class DepartmentComponent implements OnInit {
 
   // Khởi tạo một đối tượng phòng ban rỗng
   private getEmptyDepartment(): Department {
-    return { id: 0, name: '', description: '', workStatus: { id: this.workStatuses[0].value, name: this.workStatuses[0].label } };
+    return { id: 0, name: '', description: '', workStatus: { id: 0, name: '' } };
   }
 
   // Đặt lại biểu mẫu sau khi thêm hoặc cập nhật phòng ban

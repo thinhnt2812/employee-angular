@@ -23,7 +23,7 @@ export const TaskStatusConstants = {
     getStatusName: (id: number): string => TaskStatuses[id] ?? '',
   
     // Hàm lấy danh sách trạng thái công việc
-    getStatuses: () => Object.entries(TaskStatuses).map(([k, v]) => ({ label: v, value: parseInt(k) })),
+    getStatuses: () => Object.entries(TaskStatuses).map(([k, v]) => ({ name: v, id: parseInt(k) })),
   };
   
   const TaskStatuses: Record<number, string> = {
