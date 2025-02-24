@@ -40,6 +40,8 @@ export class TaskComponent implements OnInit {
   filterConfirmed = false; // Biến lưu trữ trạng thái xác nhận lọc
   notificationMessage: string = '';
   notificationTimeout: any = null;
+  assigneeSearchTerm = ''; // Biến lưu trữ giá trị tìm kiếm người xử lý
+  filteredEmployees: Employee[] = []; // Danh sách nhân viên đã lọc theo từ khóa tìm kiếm
 
   @ViewChild('content') modalContent: any;
 
@@ -118,6 +120,7 @@ export class TaskComponent implements OnInit {
   async loadEmployeesByDepartment(departmentId: number) {
     const allEmployees = await this.taskService.getEmployeesByDepartment(departmentId);
     this.employees = allEmployees.filter(employee => employee.workStatus === 1);
+    this.filteredEmployees = this.employees; // Khởi tạo danh sách nhân viên đã lọc
   }
 
   // Sắp xếp danh sách nhiệm vụ theo trường và hướng sắp xếp
@@ -215,6 +218,9 @@ export class TaskComponent implements OnInit {
   // Mở modal để thêm hoặc chỉnh sửa nhiệm vụ
   openModal(content: any) {
     this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+    if (this.employees.length > 5) {
+      this.filteredEmployees = this.employees; // Khởi tạo danh sách nhân viên đã lọc
+    }
   }
 
   // Đóng modal và đặt lại biểu mẫu
@@ -269,6 +275,24 @@ export class TaskComponent implements OnInit {
     this.loadTasks();
     this.updateTotalItems();
     this.updateUrlWithFilters(); // Update URL with filter parameters
+  }
+
+  // Xử lý tìm kiếm người xử lý khi giá trị từ khóa thay đổi
+  onAssigneeSearchTermChange() {
+    if (this.assigneeSearchTerm.trim()) {
+      this.filteredEmployees = this.employees.filter(employee =>
+        employee.name.toLowerCase().includes(this.assigneeSearchTerm.toLowerCase())
+      );
+    } else {
+      this.filteredEmployees = this.employees; // Show all employees in the department
+    }
+  }
+
+  // Chọn người xử lý từ gợi ý
+  selectAssignee(name: string) {
+    this.newTask.assignee = name;
+    this.assigneeSearchTerm = name;
+    this.filteredEmployees = [];
   }
 
   // Khởi tạo một đối tượng nhiệm vụ rỗng
