@@ -8,10 +8,11 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
 import { Router, ActivatedRoute } from '@angular/router'; 
+import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
 
 @Component({
   selector: 'app-task',
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css']
 })
@@ -39,7 +40,6 @@ export class TaskComponent implements OnInit {
   selectedPriority: number | null = null;
   filterConfirmed = false; // Biến lưu trữ trạng thái xác nhận lọc
   notificationMessage: string = '';
-  notificationTimeout: any = null;
   assigneeSearchTerm = ''; // Biến lưu trữ giá trị tìm kiếm người xử lý
   filteredEmployees: Employee[] = []; // Danh sách nhân viên đã lọc theo từ khóa tìm kiếm
 
@@ -386,11 +386,5 @@ export class TaskComponent implements OnInit {
 
   showNotification(message: string) {
     this.notificationMessage = message;
-    if (this.notificationTimeout) {
-      clearTimeout(this.notificationTimeout);
-    }
-    this.notificationTimeout = setTimeout(() => {
-      this.notificationMessage = '';
-    }, 5000);
   }
 }

@@ -6,10 +6,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeService } from '../employee.service';
 import { Employee, EmployeeConstants } from '../employee.model';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
+import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
 
 @Component({
   selector: 'app-employee-management',
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
@@ -57,6 +58,8 @@ export class EmployeeManagementComponent implements OnInit {
   filterDepartment: number | null = null;
   filterWorkStatus: number | null = null;
 
+  notificationMessage: string = ''; // Add the new property
+
   constructor(
     private employeeService: EmployeeService,
     private router: Router,
@@ -69,11 +72,13 @@ export class EmployeeManagementComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
       this.itemsPerPage = +params['icpp'] || 10;
+      this.filterDepartment = params['department'] ? +params['department'] : null; 
+      this.filterWorkStatus = params['workStatus'] ? +params['workStatus'] : null;
       this.fetchEmployees();
     });
     this.fetchDepartments();
     this.updateSortIconsFromParams();
-    this.setDefaultSortParams(); // Thêm dòng này
+    this.setDefaultSortParams();
   }
 
   // Hàm này lấy danh sách phòng ban từ service
@@ -102,8 +107,8 @@ export class EmployeeManagementComponent implements OnInit {
 
   // Hàm này áp dụng sắp xếp ban đầu dựa trên tham số truy vấn
   private applyInitialSorting(): void {
-    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
-    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    const direction = this.route.snapshot.queryParamMap.get('sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('direction') as keyof Employee || 'id';
     this.sortOrder[attribute] = direction === 'asc';
     this.originalEmployeeList.sort((a, b) => {
       const valueA = a[attribute] ?? '';
@@ -137,8 +142,8 @@ export class EmployeeManagementComponent implements OnInit {
 
   // Hàm này áp dụng sắp xếp cho danh sách nhân viên
   private applySorting(employeeList: Employee[]): Employee[] {
-    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
-    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    const direction = this.route.snapshot.queryParamMap.get('sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('direction') as keyof Employee || 'id';
     const order = direction === 'asc' ? 1 : -1;
 
     return employeeList.sort((a, b) => {
@@ -166,7 +171,14 @@ export class EmployeeManagementComponent implements OnInit {
   // Hàm này cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
   private updateUrl(): void {
     this.router.navigate([], {
-      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, Direction: this.route.snapshot.queryParamMap.get('Direction'), Sort: this.route.snapshot.queryParamMap.get('Sort') },
+      queryParams: { 
+        page: this.currentPage, 
+        icpp: this.itemsPerPage, 
+        direction: this.route.snapshot.queryParamMap.get('direction'), 
+        sort: this.route.snapshot.queryParamMap.get('sort'),
+        department: this.filterDepartment, // Add filterDepartment to queryParams
+        workStatus: this.filterWorkStatus // Add filterWorkStatus to queryParams
+      },
       queryParamsHandling: 'merge'
     });
   }
@@ -200,6 +212,7 @@ export class EmployeeManagementComponent implements OnInit {
         this.fetchEmployees();
         this.resetForm();
         this.modalService.dismissAll(); // Close modal after update
+        this.showNotification('Sửa nhân viên thành công'); // Show notification
       });
     } else {
       this.employeeService.addEmployee(this.currentEmployee).then(id => {
@@ -209,6 +222,7 @@ export class EmployeeManagementComponent implements OnInit {
         this.updateEmployeeList();
         this.resetForm();
         this.modalService.dismissAll(); // Close modal after add
+        this.showNotification('Thêm nhân viên thành công'); // Show notification
       });
     }
   }
@@ -224,6 +238,10 @@ export class EmployeeManagementComponent implements OnInit {
   onEdit(employee: Employee): void {
     this.editMode = true;
     this.currentEmployee = { ...employee };
+    this.router.navigate([], {
+      queryParams: { editEmployeeId: employee.id },
+      queryParamsHandling: 'merge'
+    });
     this.openModal();
   }
 
@@ -239,6 +257,7 @@ export class EmployeeManagementComponent implements OnInit {
       this.employeeService.deleteEmployee(this.employeeIdToDelete).then(() => {
         this.fetchEmployees();
         this.employeeIdToDelete = null;
+        this.showNotification('Xóa nhân viên thành công'); // Show notification
       });
     }
   }
@@ -330,7 +349,7 @@ export class EmployeeManagementComponent implements OnInit {
   // Hàm này cập nhật URL với tham số sắp xếp
   private updateUrlWithSortParams(attribute: keyof Employee, direction: string): void {
     this.router.navigate([], {
-      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, Direction: attribute, Sort: direction },
+      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: attribute, sort: direction },
       queryParamsHandling: 'merge'
     });
   }
@@ -404,17 +423,22 @@ export class EmployeeManagementComponent implements OnInit {
 
   // Hàm này cập nhật biểu tượng sắp xếp từ tham số truy vấn
   private updateSortIconsFromParams(): void {
-    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
-    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    const direction = this.route.snapshot.queryParamMap.get('sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('direction') as keyof Employee || 'id';
     this.sortOrder[attribute] = direction === 'asc';
     this.updateSortIcons(attribute);
   }
 
   // Thêm phương thức này để đặt tham số sắp xếp mặc định
   private setDefaultSortParams(): void {
-    const direction = this.route.snapshot.queryParamMap.get('Sort') || 'asc';
-    const attribute = this.route.snapshot.queryParamMap.get('Direction') as keyof Employee || 'id';
+    const direction = this.route.snapshot.queryParamMap.get('sort') || 'asc';
+    const attribute = this.route.snapshot.queryParamMap.get('direction') as keyof Employee || 'id';
     this.sortOrder[attribute] = direction === 'asc';
     this.updateUrlWithSortParams(attribute, direction);
+  }
+
+  // Hàm này hiển thị thông báo
+  showNotification(message: string) {
+    this.notificationMessage = message;
   }
 }

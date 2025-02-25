@@ -6,10 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
 import { Router, ActivatedRoute } from '@angular/router'; 
+import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
 
 @Component({
   selector: 'app-department',
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css']
 })
@@ -30,6 +31,7 @@ export class DepartmentComponent implements OnInit {
   itemsPerPage = 10; // Số mục trên mỗi trang
   totalItems = 0; // Tổng số mục
   selectedStatus: number | null = null; // Trạng thái làm việc được chọn
+  notificationMessage: string = ''; // Thông báo
 
   constructor(private departmentService: DepartmentService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
@@ -41,6 +43,8 @@ export class DepartmentComponent implements OnInit {
       const sortAttribute = params['direction'] || 'id';
       this.sortField = sortAttribute;
       this.sortDirection = sortDirection;
+      this.selectedStatus = params['status'] ? +params['status'] : null; // Set selectedStatus from query params
+      this.searchTerm = params['search'] || ''; // Set searchTerm from query params
       this.loadDepartments();
     });
     this.setNextDepartmentId(); // Đặt ID cho phòng ban mới
@@ -111,12 +115,15 @@ export class DepartmentComponent implements OnInit {
       const index = this.departments.findIndex(dept => dept.id === this.newDepartment.id);
       if (index !== -1) this.departments[index] = { ...this.newDepartment };
       this.isEditing = false;
+      this.showNotification('Cập nhật phòng ban thành công');
     } else {
       await this.departmentService.addDepartment({ ...this.newDepartment });
       this.departments.unshift({ ...this.newDepartment });
+      this.showNotification('Thêm phòng ban thành công');
     }
     this.resetForm();
     modal.close();
+    this.removeDepartmentIdFromUrl(); // Remove department ID from URL after saving
   }
 
   // Xóa phòng ban dựa trên ID
@@ -124,6 +131,7 @@ export class DepartmentComponent implements OnInit {
     await this.departmentService.deleteDepartment(id);
     this.loadDepartments();
     this.setNextDepartmentId();
+    this.showNotification('Xóa phòng ban thành công');
   }
 
   // Chỉnh sửa thông tin phòng ban
@@ -131,6 +139,7 @@ export class DepartmentComponent implements OnInit {
     this.newDepartment = { ...department };
     this.isEditing = true;
     this.setWorkStatus(department.workStatus.id);
+    this.updateUrlWithDepartmentId(department.id); // Update URL with department ID
     this.openModal(content);
   }
 
@@ -149,6 +158,7 @@ export class DepartmentComponent implements OnInit {
   closeModal(modal: any) {
     modal.close();
     this.resetForm();
+    this.removeDepartmentIdFromUrl(); // Remove department ID from URL
   }
 
   // Mở modal xác nhận xóa phòng ban
@@ -165,6 +175,7 @@ export class DepartmentComponent implements OnInit {
       this.setNextDepartmentId();
       this.departmentToDelete = null;
       modal.close();
+      this.showNotification('Xóa phòng ban thành công');
     }
   }
 
@@ -172,12 +183,14 @@ export class DepartmentComponent implements OnInit {
   onSearchTermChange() {
     if (!this.searchTerm.trim()) {
       this.loadDepartments();
+      this.removeSearchTermFromUrl(); 
     }
   }
 
   // Xử lý thay đổi trạng thái làm việc
   onStatusChange() {
-    // Không cần đặt cờ
+    // this.updateUrl();
+    // this.loadDepartments();
   }
 
   // Xác nhận thay đổi trạng thái làm việc
@@ -200,8 +213,18 @@ export class DepartmentComponent implements OnInit {
 
   // Hàm này cập nhật URL với tham số trang hiện tại và số bản ghi trên trang
   private updateUrl(): void {
+    const queryParams: any = { 
+      page: this.currentPage, 
+      icpp: this.itemsPerPage, 
+      direction: this.sortField, 
+      sort: this.sortDirection,
+      status: this.selectedStatus // Add selected status to URL
+    };
+    if (this.searchTerm.trim()) {
+      queryParams.search = this.searchTerm; // Add search term to URL only if it's not empty
+    }
     this.router.navigate([], {
-      queryParams: { page: this.currentPage, icpp: this.itemsPerPage, direction: this.sortField, sort: this.sortDirection },
+      queryParams,
       queryParamsHandling: 'merge'
     });
   }
@@ -227,5 +250,30 @@ export class DepartmentComponent implements OnInit {
         (!this.searchTerm.trim() || department.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
         (!this.selectedStatus || department.workStatus.id === this.selectedStatus)
       ).length;
+  }
+
+  private updateUrlWithDepartmentId(departmentId: number): void {
+    this.router.navigate([], {
+      queryParams: { departmentId: departmentId },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  private removeDepartmentIdFromUrl(): void {
+    this.router.navigate([], {
+      queryParams: { departmentId: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  private removeSearchTermFromUrl(): void {
+    this.router.navigate([], {
+      queryParams: { search: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  showNotification(message: string) {
+    this.notificationMessage = message;
   }
 }
