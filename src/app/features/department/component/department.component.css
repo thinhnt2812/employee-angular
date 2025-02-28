@@ -266,7 +266,6 @@
     display: flex;
     justify-content: space-between;
     width: 85%;
-    margin-bottom: 20px;
     align-items: flex-end;
 }
 
@@ -289,4 +288,10 @@
     font-weight: 500;
     font-style: italic;
     height: 40px;
+}
+
+.pagination_number{
+    width: 85%;
+    display: flex;
+    justify-content: flex-end;
 }

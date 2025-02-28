@@ -26,10 +26,21 @@
       <button class="department_btns" (click)="confirmStatusChange()">Lọc</button>
     </div>
   </div>
+  
 
   <!-- Notification -->
   <app-notification [message]="notificationMessage"></app-notification>
-    
+  
+  
+  <div class="pagination_number">
+    <app-paginationnumber
+      [currentPage]="currentPage"
+      [itemsPerPage]="itemsPerPage"
+      [totalItems]="totalItems"
+      (pageChange)="onPageChange($event)">
+    </app-paginationnumber>
+  </div>
+
   <ng-template #content let-modal>
     <div class="modal-header">
       <h5 class="modal-title" id="modal-basic-title">{{ isEditing ? 'Cập nhật phòng ban' : 'Thêm phòng ban' }}</h5>

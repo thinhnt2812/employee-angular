@@ -7,12 +7,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PaginationNumberComponent } from '../../../shared/pagination_number/pagination_number.component';
 import { Router, ActivatedRoute } from '@angular/router'; 
 import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
 
 @Component({
   selector: 'app-task',
-  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent, PaginationNumberComponent], // Add the new component to imports
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css']
 })
@@ -181,19 +182,30 @@ export class TaskComponent implements OnInit {
       this.showNotification('Cập nhật thành công');
     } else {
       await this.taskService.addTask({ ...this.newTask });
-      this.tasks.unshift({ ...this.newTask });
+      this.totalItems++; // Tăng tổng số mục sau khi thêm nhiệm vụ mới
+      if (this.tasks.length < this.itemsPerPage) {
+        this.tasks.unshift({ ...this.newTask });
+      } else {
+        this.tasks.unshift({ ...this.newTask });
+        this.tasks.pop(); // Xóa nhiệm vụ cuối cùng để giữ trang hiện tại trong giới hạn
+      }
       this.showNotification('Thêm thành công.');
     }
     this.resetForm();
     modal.close();
     this.loadEmployees(); // Tải lại danh sách nhân viên sau khi thêm hoặc cập nhật nhiệm vụ
     this.modalService.dismissAll(); // Đóng tất cả các modal
-    this.removeTaskIdFromUrl(); // Remove task ID from URL
+    this.removeTaskIdFromUrl(); // Xóa ID nhiệm vụ khỏi URL
+    this.updateUrl(); // Cập nhật URL để phản ánh các thay đổi
   }
 
   // Xóa nhiệm vụ dựa trên ID
   async deleteTask(id: number) {
     await this.taskService.deleteTask(id);
+    this.totalItems--;
+    if (this.totalItems <= (this.currentPage - 1) * this.itemsPerPage) {
+      this.currentPage = Math.max(this.currentPage - 1, 1);
+    }
     this.loadTasks();
     this.setNextTaskId();
     this.showNotification('Xóa thành công');
@@ -205,7 +217,7 @@ export class TaskComponent implements OnInit {
     this.isEditing = true;
     this.setStatus(task.status.id);
     this.loadEmployeesByDepartment(task.department); // Tải nhân viên theo phòng ban khi chỉnh sửa nhiệm vụ
-    this.updateUrlWithTaskId(task.id); // Update URL with task ID
+    this.updateUrlWithTaskId(task.id); // Cập nhật URL với ID nhiệm vụ
     this.openModal(content);
   }
 
@@ -227,7 +239,7 @@ export class TaskComponent implements OnInit {
   closeModal(modal: any) {
     modal.close();
     this.resetForm();
-    this.removeTaskIdFromUrl(); // Remove task ID from URL
+    this.removeTaskIdFromUrl(); // Xóa ID nhiệm vụ khỏi URL
     this.modalService.dismissAll();
   }
 
@@ -241,6 +253,10 @@ export class TaskComponent implements OnInit {
   async confirmDelete(modal: any) {
     if (this.taskToDelete !== null) {
       await this.taskService.deleteTask(this.taskToDelete);
+      this.totalItems--;
+      if (this.totalItems <= (this.currentPage - 1) * this.itemsPerPage) {
+        this.currentPage = Math.max(this.currentPage - 1, 1);
+      }
       this.loadTasks();
       this.setNextTaskId();
       this.taskToDelete = null;
@@ -255,6 +271,7 @@ export class TaskComponent implements OnInit {
     if (!this.searchTerm.trim()) {
       this.searchConfirmed = true;
       this.loadTasks();
+      this.removeSearchTermFromUrl(); // Xóa từ khóa tìm kiếm khỏi URL
     }
   }
 
@@ -274,7 +291,7 @@ export class TaskComponent implements OnInit {
     this.filterConfirmed = true;
     this.loadTasks();
     this.updateTotalItems();
-    this.updateUrlWithFilters(); // Update URL with filter parameters
+    this.updateUrlWithFilters(); // Cập nhật URL với các tham số lọc
   }
 
   // Xử lý tìm kiếm người xử lý khi giá trị từ khóa thay đổi
@@ -284,7 +301,7 @@ export class TaskComponent implements OnInit {
         employee.name.toLowerCase().includes(this.assigneeSearchTerm.toLowerCase())
       );
     } else {
-      this.filteredEmployees = this.employees; // Show all employees in the department
+      this.filteredEmployees = this.employees; // Hiển thị tất cả nhân viên trong phòng ban
     }
   }
 
@@ -337,6 +354,7 @@ export class TaskComponent implements OnInit {
     });
   }
 
+  // Cập nhật tổng số nhiệm vụ
   private async updateTotalItems() {
     const allTasks = await this.taskService.getTasks();
     this.totalItems = allTasks
@@ -348,6 +366,7 @@ export class TaskComponent implements OnInit {
       ).length;
   }
 
+  // Cập nhật URL với ID nhiệm vụ
   private updateUrlWithTaskId(taskId: number): void {
     this.router.navigate([], {
       queryParams: { taskId: taskId },
@@ -355,6 +374,7 @@ export class TaskComponent implements OnInit {
     });
   }
 
+  // Xóa ID nhiệm vụ khỏi URL
   private removeTaskIdFromUrl(): void {
     this.router.navigate([], {
       queryParams: { taskId: null },
@@ -362,6 +382,7 @@ export class TaskComponent implements OnInit {
     });
   }
 
+  // Cập nhật URL với các tham số lọc
   private updateUrlWithFilters(): void {
     const queryParams: any = {
       page: this.currentPage,
@@ -369,6 +390,11 @@ export class TaskComponent implements OnInit {
       direction: this.sortField,
       sort: this.sortDirection
     };
+    if (this.searchTerm.trim()) {
+      queryParams.search = this.searchTerm; // Bao gồm từ khóa tìm kiếm trong URL nếu không trống
+    } else {
+      queryParams.search = null; // Xóa từ khóa tìm kiếm khỏi URL nếu trống
+    }
     if (this.selectedDepartment !== null) queryParams.department = this.selectedDepartment;
     else queryParams.department = null;
     
@@ -384,6 +410,15 @@ export class TaskComponent implements OnInit {
     });
   }
 
+  // Xóa từ khóa tìm kiếm khỏi URL
+  private removeSearchTermFromUrl(): void {
+    this.router.navigate([], {
+      queryParams: { search: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  // Hiển thị thông báo
   showNotification(message: string) {
     this.notificationMessage = message;
   }

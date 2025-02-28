@@ -1,9 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
+  imports: [CommonModule, FormsModule],
+  templateUrl: './pagination.component.html'
 })
 export class PaginationComponent {
   @Input() currentPage: number = 1;
@@ -31,5 +33,24 @@ export class PaginationComponent {
   goToLastPage(): void {
     const lastPage = Math.ceil(this.totalItems / this.itemsPerPage);
     this.pageChange.emit(lastPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.getTotalPages()) {
+      this.pageChange.emit(page);
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
+  getPageNumbers(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 }

@@ -6,11 +6,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmployeeService } from '../employee.service';
 import { Employee, EmployeeConstants } from '../employee.model';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
+import { PaginationNumberComponent } from '../../../shared/pagination_number/pagination_number.component'; 
 import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
 
 @Component({
   selector: 'app-employee-management',
-  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent, PaginationNumberComponent], // Add the new component to imports
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })

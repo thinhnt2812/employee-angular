@@ -44,6 +44,15 @@
     </div>
   </div>
 
+  <div class="pagination_number">
+    <app-paginationnumber
+      [currentPage]="currentPage"
+      [itemsPerPage]="itemsPerPage"
+      [totalItems]="totalItems"
+      (pageChange)="onPageChange($event)">
+    </app-paginationnumber>
+  </div>
+
   <!-- Notification -->
   <app-notification [message]="notificationMessage"></app-notification>
 
@@ -196,4 +205,4 @@
     [totalItems]="totalItems"
     (pageChange)="onPageChange($event)">
   </app-pagination>
-</div>
+</div>zz

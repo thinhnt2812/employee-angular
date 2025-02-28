@@ -5,12 +5,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component'; 
+import { PaginationNumberComponent } from '../../../shared/pagination_number/pagination_number.component'; 
 import { Router, ActivatedRoute } from '@angular/router'; 
-import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
+import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import thành phần mới
 
 @Component({
   selector: 'app-department',
-  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent], // Add the new component to imports
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent, PaginationNumberComponent], // Thêm thành phần mới vào imports
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css']
 })
@@ -43,9 +44,14 @@ export class DepartmentComponent implements OnInit {
       const sortAttribute = params['direction'] || 'id';
       this.sortField = sortAttribute;
       this.sortDirection = sortDirection;
-      this.selectedStatus = params['status'] ? +params['status'] : null; // Set selectedStatus from query params
-      this.searchTerm = params['search'] || ''; // Set searchTerm from query params
-      this.loadDepartments();
+      this.selectedStatus = params['status'] ? +params['status'] : null; // Đặt selectedStatus từ query params
+      this.searchTerm = params['search'] || ''; // Đặt searchTerm từ query params
+      const departmentId = params['departmentId'] ? +params['departmentId'] : null;
+      if (departmentId) {
+        this.loadDepartmentById(departmentId);
+      } else {
+        this.loadDepartments();
+      }
     });
     this.setNextDepartmentId(); // Đặt ID cho phòng ban mới
   }
@@ -118,17 +124,26 @@ export class DepartmentComponent implements OnInit {
       this.showNotification('Cập nhật phòng ban thành công');
     } else {
       await this.departmentService.addDepartment({ ...this.newDepartment });
-      this.departments.unshift({ ...this.newDepartment });
       this.showNotification('Thêm phòng ban thành công');
+      this.updateTotalItems(); // Cập nhật tổng số mục sau khi thêm phòng ban mới
+      await this.loadDepartments(); // Tải lại danh sách phòng ban để đảm bảo phân trang chính xác
+      this.departments.unshift({ ...this.newDepartment }); // Thêm phòng ban mới vào đầu danh sách
+      if (this.departments.length > this.itemsPerPage) {
+        this.departments.pop(); // Xóa phòng ban cuối cùng nếu tổng số vượt quá số mục trên mỗi trang
+      }
     }
     this.resetForm();
     modal.close();
-    this.removeDepartmentIdFromUrl(); // Remove department ID from URL after saving
+    this.removeDepartmentIdFromUrl(); // Xóa ID phòng ban khỏi URL sau khi lưu
   }
 
   // Xóa phòng ban dựa trên ID
   async deleteDepartment(id: number) {
     await this.departmentService.deleteDepartment(id);
+    this.updateTotalItems();
+    if (this.currentPage > 1 && this.departments.length === 1) {
+      this.currentPage--;
+    }
     this.loadDepartments();
     this.setNextDepartmentId();
     this.showNotification('Xóa phòng ban thành công');
@@ -139,7 +154,7 @@ export class DepartmentComponent implements OnInit {
     this.newDepartment = { ...department };
     this.isEditing = true;
     this.setWorkStatus(department.workStatus.id);
-    this.updateUrlWithDepartmentId(department.id); // Update URL with department ID
+    this.updateUrlWithDepartmentId(department.id); // Cập nhật URL với ID phòng ban
     this.openModal(content);
   }
 
@@ -158,7 +173,7 @@ export class DepartmentComponent implements OnInit {
   closeModal(modal: any) {
     modal.close();
     this.resetForm();
-    this.removeDepartmentIdFromUrl(); // Remove department ID from URL
+    this.removeDepartmentIdFromUrl(); // Xóa ID phòng ban khỏi URL
   }
 
   // Mở modal xác nhận xóa phòng ban
@@ -171,6 +186,10 @@ export class DepartmentComponent implements OnInit {
   async confirmDelete(modal: any) {
     if (this.departmentToDelete !== null) {
       await this.departmentService.deleteDepartment(this.departmentToDelete);
+      this.updateTotalItems();
+      if (this.currentPage > 1 && this.departments.length === 1) {
+        this.currentPage--;
+      }
       this.loadDepartments();
       this.setNextDepartmentId();
       this.departmentToDelete = null;
@@ -218,10 +237,10 @@ export class DepartmentComponent implements OnInit {
       icpp: this.itemsPerPage, 
       direction: this.sortField, 
       sort: this.sortDirection,
-      status: this.selectedStatus // Add selected status to URL
+      status: this.selectedStatus // Thêm trạng thái được chọn vào URL
     };
     if (this.searchTerm.trim()) {
-      queryParams.search = this.searchTerm; // Add search term to URL only if it's not empty
+      queryParams.search = this.searchTerm; // Thêm từ khóa tìm kiếm vào URL chỉ khi nó không rỗng
     }
     this.router.navigate([], {
       queryParams,
@@ -243,6 +262,7 @@ export class DepartmentComponent implements OnInit {
     return 'fa-arrows-up-down';
   }
 
+  // Cập nhật tổng số mục
   private async updateTotalItems() {
     const allDepartments = await this.departmentService.getDepartments();
     this.totalItems = allDepartments
@@ -252,6 +272,7 @@ export class DepartmentComponent implements OnInit {
       ).length;
   }
 
+  // Cập nhật URL với ID phòng ban
   private updateUrlWithDepartmentId(departmentId: number): void {
     this.router.navigate([], {
       queryParams: { departmentId: departmentId },
@@ -259,6 +280,7 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
+  // Xóa ID phòng ban khỏi URL
   private removeDepartmentIdFromUrl(): void {
     this.router.navigate([], {
       queryParams: { departmentId: null },
@@ -266,6 +288,7 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
+  // Xóa từ khóa tìm kiếm khỏi URL
   private removeSearchTermFromUrl(): void {
     this.router.navigate([], {
       queryParams: { search: null },
@@ -273,7 +296,19 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
+  // Hiển thị thông báo
   showNotification(message: string) {
     this.notificationMessage = message;
+  }
+
+  // Load department by ID and set editing state
+  async loadDepartmentById(departmentId: number) {
+    const departments = await this.departmentService.getDepartments();
+    const department = departments.find(dept => dept.id === departmentId);
+    if (department) {
+      this.newDepartment = { ...department };
+      this.isEditing = true;
+      this.setWorkStatus(department.workStatus.id);
+    }
   }
 }

@@ -1,0 +1,75 @@
+<div class="pagination">
+    <div class="page-numbers">
+        <button (click)="goToFirstPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><<</button>
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1" [class.disabled]="currentPage === 1"><</button>
+        <button *ngFor="let page of getPageNumbers()" (click)="goToPage(page)" [class.active]="isCurrentPage(page)" [disabled]="isEllipsis(page)">
+            <span *ngIf="isEllipsis(page)">...</span>
+            <span *ngIf="!isEllipsis(page)">{{ page }}</span>
+        </button>
+        <button (click)="goToNextPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">></button>
+        <button (click)="goToLastPage()" [disabled]="currentPage * itemsPerPage >= totalItems" [class.disabled]="currentPage * itemsPerPage >= totalItems">>></button>
+    </div>
+</div>
+
+<style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.2);
+}
+
+.page-numbers button {
+    background: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    color: #ADACAC;
+
+}
+
+.page-numbers button:hover {
+    background: #3399FF;
+    color: white;
+}
+
+.page-numbers button.active {
+    background: #3399FF;
+    color: white;
+    font-weight: bold;
+}
+
+.page-numbers button.disabled {
+    color: #999da1;
+    cursor: not-allowed;
+}
+
+.page-numbers button:first-child,
+.page-numbers button:nth-child(2),
+.page-numbers button:last-child,
+.page-numbers button:nth-last-child(2) {
+    font-size: 14px;
+    color: #252841;
+    background-color: white;
+}
+
+.page-numbers button:first-child.disabled,
+.page-numbers button:nth-child(2).disabled,
+.page-numbers button:last-child.disabled,
+.page-numbers button:nth-last-child(2).disabled {
+    color: #999da1;
+    cursor: not-allowed;
+}
+
+</style>
