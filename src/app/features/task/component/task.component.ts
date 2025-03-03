@@ -9,11 +9,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
 import { PaginationNumberComponent } from '../../../shared/pagination_number/pagination_number.component';
 import { Router, ActivatedRoute } from '@angular/router'; 
-import { NotificationComponent } from '../../../shared/notification/notification.component'; // Import the new component
+import { NotificationComponent } from '../../../shared/notification/notification.component'; 
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-task',
-  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent, PaginationNumberComponent], // Add the new component to imports
+  imports: [CommonModule, FormsModule, PaginationComponent, NotificationComponent, PaginationNumberComponent,  QuillModule], 
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css']
 })
@@ -43,8 +44,29 @@ export class TaskComponent implements OnInit {
   notificationMessage: string = '';
   assigneeSearchTerm = ''; // Biến lưu trữ giá trị tìm kiếm người xử lý
   filteredEmployees: Employee[] = []; // Danh sách nhân viên đã lọc theo từ khóa tìm kiếm
+  editorContent = '';
+  quillConfig = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'], // In đậm, nghiêng, gạch chân, gạch ngang
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'direction': 'rtl' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['blockquote', 'code-block'], // Trích dẫn & Khối code
+      ['clean'], 
+      ['link', 'image', 'video'], 
+      ['table'] // Nếu dùng module bảng
+    ]
+  };
 
   @ViewChild('content') modalContent: any;
+  selectedTaskDescription: string = '';
+  selectedTask: Task | null = null;
 
   constructor(private taskService: TaskService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) {}
 
@@ -421,5 +443,24 @@ export class TaskComponent implements OnInit {
   // Hiển thị thông báo
   showNotification(message: string) {
     this.notificationMessage = message;
+  }
+
+  toggleDescription(task: any) {
+    task.showDescription = !task.showDescription;
+  }
+
+  openDescriptionModal(task: Task, content: any) {
+    this.selectedTask = task;
+    this.selectedTaskDescription = task.description;
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  async saveDescription() {
+    if (this.selectedTask) {
+      this.selectedTask.description = this.selectedTaskDescription;
+      await this.taskService.updateTask(this.selectedTask);
+      this.showNotification('Mô tả đã được cập nhật');
+      this.modalService.dismissAll();
+    }
   }
 }

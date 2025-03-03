@@ -63,69 +63,75 @@
       <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="closeModal(modal)"></button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label>Mã nhiệm vụ</label>
-        <input class="form-control" [(ngModel)]="newTask.id" placeholder="Mã nhiệm vụ" disabled />
+      <div class="form_ctm1">
+        <div class="form-group">
+          <label>Mã nhiệm vụ</label>
+          <input class="form-control" [(ngModel)]="newTask.id" placeholder="Mã nhiệm vụ" disabled />
+        </div>
+        <div class="form-group">
+          <label>Tên nhiệm vụ</label>
+          <input class="form-control" [(ngModel)]="newTask.name" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Tên nhiệm vụ</label>
-        <input class="form-control" [(ngModel)]="newTask.name" />
-      </div>
-      <div class="form-group">
+      <div class="form-group form_ctm2">
         <label>Mô tả</label>
-        <input class="form-control" [(ngModel)]="newTask.description" />
+        <quill-editor [(ngModel)]="newTask.description" [modules]="quillConfig" ></quill-editor>
       </div>
-      <div class="form-group">
-        <label>Độ ưu tiên</label>
-        <input class="form-control" type="number" min="1" max="5" [(ngModel)]="newTask.priority" />
-      </div>
-      <div class="form-group">
-        <label>Phòng ban nhận nhiệm vụ</label>
-        <select class="form-control" [(ngModel)]="newTask.department" (ngModelChange)="loadEmployeesByDepartment($event)">
-          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Người xử lý nhiệm vụ</label>
-        <div *ngIf="employees.length > 5 && isEditing === false">
-          <input 
-            class="form-control" 
-            type="text" 
-            placeholder="Tìm kiếm người xử lý..." 
-            [(ngModel)]="assigneeSearchTerm"
-            (input)="onAssigneeSearchTermChange()"
-          />
-          <div *ngIf="assigneeSearchTerm.trim() && filteredEmployees.length > 5" class="suggestions">
-            <ul class="suggestion_list">
-              <li class="suggestion_item" *ngFor="let employee of filteredEmployees" (click)="selectAssignee(employee.name)">
-                {{ employee.name }}
-              </li>
-            </ul>
+      <div class="form_ctm3">
+        <div class="form-group">
+          <label>Phòng ban nhận nhiệm vụ</label>
+          <select class="form-control" [(ngModel)]="newTask.department" (ngModelChange)="loadEmployeesByDepartment($event)">
+            <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Người xử lý nhiệm vụ</label>
+          <div *ngIf="employees.length > 5 && isEditing === false">
+            <input 
+              class="form-control" 
+              type="text" 
+              placeholder="Tìm kiếm người xử lý..." 
+              [(ngModel)]="assigneeSearchTerm"
+              (input)="onAssigneeSearchTermChange()"
+            />
+            <div *ngIf="assigneeSearchTerm.trim() && filteredEmployees.length > 5" class="suggestions">
+              <ul class="suggestion_list">
+                <li class="suggestion_item" *ngFor="let employee of filteredEmployees" (click)="selectAssignee(employee.name)">
+                  {{ employee.name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div *ngIf="employees.length > 5 && isEditing === true">
+            <select class="form-control" [(ngModel)]="newTask.assignee">
+              <option *ngFor="let employee of employees" [ngValue]="employee.name">{{ employee.name }}</option>
+            </select>
+          </div>
+          <div *ngIf="employees.length > 0 && employees.length <= 5">
+            <select class="form-control" [(ngModel)]="newTask.assignee">
+              <option *ngFor="let employee of employees" [ngValue]="employee.name">{{ employee.name }}</option>
+            </select>
+          </div>
+          <div *ngIf="employees.length == 0" class="no_employee">
+            <p>Phòng này không có nhân viên nào</p>
           </div>
         </div>
-        <div *ngIf="employees.length > 5 && isEditing === true">
-          <select class="form-control" [(ngModel)]="newTask.assignee">
-            <option *ngFor="let employee of employees" [ngValue]="employee.name">{{ employee.name }}</option>
+      </div>
+      <div class="form_ctm4">
+        <div class="form-group">
+          <label>Độ ưu tiên</label>
+          <input class="form-control" type="number" min="1" max="5" [(ngModel)]="newTask.priority" />
+        </div>
+        <div class="form-group">
+          <label>Ngày hết hạn</label>
+          <input class="form-control" type="date" [(ngModel)]="newTask.dueDate" />
+        </div>
+        <div class="form-group">
+          <label>Trạng Thái</label>
+          <select class="form-control" [(ngModel)]="newTask.status">
+            <option *ngFor="let status of statuses" [ngValue]="status">{{ status.name }}</option>
           </select>
         </div>
-        <div *ngIf="employees.length > 0 && employees.length <= 5">
-          <select class="form-control" [(ngModel)]="newTask.assignee">
-            <option *ngFor="let employee of employees" [ngValue]="employee.name">{{ employee.name }}</option>
-          </select>
-        </div>
-        <div *ngIf="employees.length == 0" class="no_employee">
-          <p>Phòng này không có nhân viên nào</p>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Ngày hết hạn</label>
-        <input class="form-control" type="date" [(ngModel)]="newTask.dueDate" />
-      </div>
-      <div class="form-group">
-        <label>Trạng Thái</label>
-        <select class="form-control" [(ngModel)]="newTask.status">
-          <option *ngFor="let status of statuses" [ngValue]="status">{{ status.name }}</option>
-        </select>
       </div>
       <div *ngIf="validationMessage" class="alert alert-danger">{{ validationMessage }}</div>
     </div>
@@ -149,6 +155,22 @@
       <button type="button" class="btn modal-footer-cancel" (click)="confirmDelete(modal)">Xóa</button>
     </div>
   </ng-template>
+
+  <div class="modal_desc_ctm">
+    <ng-template #descriptionModal let-modal>
+      <div class="modal-header">
+        <h5 class="modal-title">Mô tả nhiệm vụ</h5>
+        <button type="button" class="btn-close btn_close_ctm" aria-label="Close" (click)="modal.dismiss()"></button>
+      </div>
+      <div class="modal-body">
+        <quill-editor [(ngModel)]="selectedTaskDescription" [modules]="quillConfig"></quill-editor>
+      </div>
+      <div class="modal-footer modal_footer_ctm">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Đóng</button>
+        <button type="button" class="btn modal-footer-cancel" (click)="saveDescription()">Lưu</button>
+      </div>
+    </ng-template>
+  </div>
     
   <!-- Danh sách nhiệm vụ -->
   <div class="task_table">
@@ -166,7 +188,9 @@
     <ul class="task_lists" *ngFor="let task of tasks" [ngClass]="{'past-due': isPastDueDate(task.dueDate)}">
       <li class="task_list">#TK0{{ task.id }}</li>
       <li class="task_list">{{ task.name }}</li>
-      <li class="task_list">{{ task.description }}</li>
+      <li class="task_list">
+        <i class="fa-solid fa-eye desc_ctm" (click)="openDescriptionModal(task, descriptionModal)"></i>
+      </li>
       <li class="task_list">{{ task.priority }}</li>
       <li class="task_list">{{ getDepartmentName(task.department) }}</li>
       <li class="task_list">{{ task.assignee }}</li>
@@ -205,4 +229,4 @@
     [totalItems]="totalItems"
     (pageChange)="onPageChange($event)">
   </app-pagination>
-</div>zz
+</div>

@@ -142,17 +142,13 @@
 
 .task_info li {
     list-style: none;
-    width: calc(100%/10); 
+    width: calc(100%/9); 
     user-select: none;
 }
 
 .task_info li:hover {
     cursor: pointer;
     color: #F4D793;
-}
-
-.task_info li:nth-child(3) {
-    width: 20%;
 }
 
 .task_info li:last-child {
@@ -179,18 +175,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: calc(100%/10);
+    width: calc(100%/9);
     font-size: 14px;
     color: #333;
     list-style: none;
 }
 
-.task_list:nth-child(3) {
-    width: 20%;
-}
-
 .task_list:nth-child(2),
-.task_list:nth-child(3),
 .task_list:nth-child(5),
 .task_list:nth-child(6){
     justify-content: flex-start;
@@ -219,6 +210,14 @@
 
 .task_list p{
     margin-bottom: 0;
+}
+
+.desc_ctm {
+    font-size: 20px;
+    cursor: pointer;
+}
+.desc_ctm:hover {
+    color: #ebaa13;
 }
 
 .task_btn {
@@ -397,4 +396,47 @@
     width: 85%;
     display: flex;
     justify-content: flex-end;
+}
+
+.form_ctm4,
+.form_ctm3,
+.form_ctm1{
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.form_ctm1 .form-group:nth-child(1){
+    width: 20%;
+}
+.form_ctm1 .form-group:nth-child(2){
+    width: 80%;
+}
+
+.form_ctm3 .form-group{
+    width: 50%;
+}
+
+.form_ctm4 .form-group{
+    margin-bottom: 0;
+    width: calc(100%/3);
+}
+
+
+.form_ctm2{
+    display: flex;
+    flex-direction: column;
+}
+
+::ng-deep .modal-content {
+    max-width: 45%;
+    margin: auto;
+}
+
+::ng-deep .modal-dialog{
+    max-width: 100%;
+}
+
+::ng-deep .ql-editor {
+    min-height: 260px !important;
 }

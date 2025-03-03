@@ -8,6 +8,7 @@ export interface Task {
     dueDate: string; // Ngày hết hạn của nhiệm vụ
     assignee: string; // Người được giao nhiệm vụ
     status: { id: number, name: string }; // Trạng thái của nhiệm vụ
+    showDescription?: boolean;
 }
 
 export const TaskStatusConstants = {
